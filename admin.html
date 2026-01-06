@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POPETOWN Admin | Command Center</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-red: #ff0000;
+            --bg-black: #050505;
+        }
+        body {
+            background-color: var(--bg-black);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        h1, h2, h3 { font-family: 'Orbitron', sans-serif; }
+        
+        /* High Priority Navigation Fixes */
+        #adminNav {
+            display: flex !important;
+            visibility: visible !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 0, 0, 0.2);
+        }
+
+        .glass-panel {
+            background: rgba(15, 15, 15, 0.95);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 1);
+            backdrop-filter: blur(12px);
+            border-radius: 4px;
+        }
+
+        .neon-accent {
+            color: var(--brand-red);
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+        }
+
+        .btn-red {
+            background: var(--brand-red);
+            color: white;
+            padding: 12px 24px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            cursor: pointer;
+            border: none;
+            text-align: center;
+        }
+
+        .btn-red:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn {
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 10px 15px;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
+
+        .nav-btn:hover {
+            color: var(--brand-red);
+            border-bottom-color: var(--brand-red);
+        }
+
+        /* File Upload Styling */
+        .file-upload-wrapper {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            border: 2px dashed rgba(255, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .file-upload-wrapper:hover {
+            background: rgba(255, 0, 0, 0.05);
+            border-color: var(--brand-red);
+        }
+        .file-upload-input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .preview-img {
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0; left: 0; z-index: -1;
+            width: 100%; height: 100%;
+        }
+
+        .scanline {
+            width: 100%; height: 2px;
+            background: rgba(255, 0, 0, 0.05);
+            position: fixed; z-index: 50;
+            pointer-events: none;
+            animation: scan 8s linear infinite;
+        }
+        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+
+        input, textarea, select {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 0.85rem;
+            outline: none;
+            transition: border 0.3s;
+            width: 100%;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--brand-red);
+        }
+
+        #accessBarrier {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .hidden { display: none !important; }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        #mobileMenu {
+            transform: translateY(-110%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #mobileMenu.open {
+            transform: translateY(0);
+        }
+
+        section { scroll-margin-top: 120px; }
+    </style>
+</head>
+<body>
+
+    <div class="scanline"></div>
+    <div id="canvas-container"></div>
+
+    <!-- ACCESS BARRIER -->
+    <div id="accessBarrier">
+        <div class="glass-panel p-8 md:p-16 max-w-lg w-full text-center border-t-8 border-red-600">
+            <h2 class="text-3xl md:text-5xl font-bold mb-4 uppercase tracking-tighter">POPETOWN <span class="text-red-600">ADMIN</span></h2>
+            <p class="text-[11px] text-zinc-500 uppercase tracking-[0.5em] mb-12">Authorization Required</p>
+            
+            <input type="password" id="passInput" placeholder="ACCESS CODE" class="text-center tracking-[1.5em] mb-8 text-red-600 font-bold border-red-600/30 text-2xl bg-zinc-900">
+            
+            <div id="errorMsg" class="text-red-600 text-xs font-bold uppercase mb-6 hidden">Invalid Code</div>
+            
+            <button id="verifyBtn" class="btn-red w-full text-lg">Establish Link</button>
+        </div>
+    </div>
+
+    <!-- ADMIN SYSTEM CONTENT -->
+    <div id="adminContent" class="hidden">
+        
+        <!-- HEADER SYSTEM -->
+        <header id="adminNav" class="p-4 md:px-12 md:py-6">
+            <div class="max-w-7xl mx-auto w-full flex justify-between items-center">
+                <div class="flex items-center gap-12">
+                    <div class="text-xl md:text-2xl font-bold tracking-tighter uppercase cursor-pointer" onclick="location.reload()">
+                        POPETOWN <span class="neon-accent">CMD</span>
+                    </div>
+                    
+                    <!-- DESKTOP NAV -->
+                    <div class="hidden md:flex items-center gap-6 border-l border-white/10 pl-12">
+                        <a href="#eventSection" class="nav-btn">Events</a>
+                        <a href="#archiveSection" class="nav-btn">Archive</a>
+                        <a href="#inquirySection" class="nav-btn">Signals</a>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-6">
+                    <div class="hidden lg:flex items-center gap-3 text-xs text-green-500 font-bold uppercase tracking-widest">
+                        <span class="status-dot bg-green-500 animate-pulse shadow-[0_0_10px_#22c55e]"></span> Live
+                    </div>
+                    
+                    <button onclick="location.reload()" class="hidden md:block text-[10px] text-zinc-500 hover:text-red-600 uppercase border border-white/10 px-5 py-2 hover:border-red-600 transition-all font-black">
+                        Terminate
+                    </button>
+                    
+                    <!-- HAMBURGER BUTTON -->
+                    <button id="menuToggle" class="md:hidden p-3 text-white border border-red-600/30 rounded bg-red-600/5">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- MOBILE MENU OVERLAY -->
+        <div id="mobileMenu" class="fixed top-0 left-0 w-full bg-black z-[9000] pt-24 pb-12 border-b border-red-600/30 flex flex-col items-center gap-10 md:hidden">
+            <a href="#eventSection" class="menu-link text-3xl font-bold uppercase tracking-[0.2em] text-white">Events</a>
+            <a href="#archiveSection" class="menu-link text-3xl font-bold uppercase tracking-[0.2em] text-white">Archive</a>
+            <a href="#inquirySection" class="menu-link text-3xl font-bold uppercase tracking-[0.2em] text-white">Signals</a>
+            <button onclick="location.reload()" class="mt-4 text-red-600 uppercase font-black tracking-widest border border-red-600 px-10 py-3">Terminate</button>
+        </div>
+
+        <!-- MAIN DASHBOARD AREA -->
+        <main class="pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto space-y-24">
+            
+            <div class="text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-8">
+                <div>
+                    <h1 class="text-3xl md:text-7xl font-bold uppercase tracking-tighter">Command <span class="text-red-600">Interface</span></h1>
+                    <p class="text-[11px] text-zinc-500 mt-4 tracking-[0.6em] uppercase italic">Admin Infrastructure v4.0 // Authorized_User</p>
+                </div>
+            </div>
+
+            <!-- SECTION 1: EVENTS -->
+            <section id="eventSection" class="space-y-12">
+                <div class="glass-panel p-8 md:p-16">
+                    <h3 class="text-2xl font-bold uppercase tracking-[0.4em] mb-12 border-b border-white/10 pb-8 flex items-center gap-6">
+                        <span class="w-3 h-3 bg-red-600 rounded-full animate-ping"></span> Event Uplink
+                    </h3>
+                    
+                    <form id="eventForm" class="space-y-10">
+                        <div class="grid md:grid-cols-2 gap-10">
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="text-[11px] text-zinc-500 uppercase mb-4 block font-bold">Production Title</label>
+                                    <input type="text" id="evTitle" required placeholder="Event Designation...">
+                                </div>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="text-[11px] text-zinc-500 uppercase mb-4 block font-bold">Date</label>
+                                        <input type="date" id="evDate" required>
+                                    </div>
+                                    <div>
+                                        <label class="text-[11px] text-zinc-500 uppercase mb-4 block font-bold">Status</label>
+                                        <select id="evStatus">
+                                            <option value="Upcoming">Upcoming</option>
+                                            <option value="Exclusive">Exclusive</option>
+                                            <option value="Sold Out">Sold Out</option>
+                                            <option value="Live Now">Live Now</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- LOCAL IMAGE UPLOAD FOR EVENTS -->
+                            <div>
+                                <label class="text-[11px] text-zinc-500 uppercase mb-4 block font-bold">Production Image (Local Storage)</label>
+                                <div class="file-upload-wrapper" id="eventDropZone">
+                                    <span id="evFileText" class="text-xs text-zinc-500 uppercase">Click to browse local files</span>
+                                    <input type="file" id="evFileInput" class="file-upload-input" accept="image/*">
+                                    <img id="evPreview" class="preview-img hidden" src="">
+                                </div>
+                                <input type="hidden" id="evImageData">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-[11px] text-zinc-500 uppercase mb-4 block font-bold tracking-widest">Description</label>
+                            <textarea id="evDesc" rows="5" placeholder="Input details..."></textarea>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" id="evSubmitBtn" class="btn-red w-full md:w-auto px-20 text-lg">Push Signal</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- EVENT NODES LIST -->
+                <div class="glass-panel p-8 md:p-12">
+                    <div class="flex justify-between items-center mb-10 border-b border-white/5 pb-6">
+                        <h4 class="text-xs font-bold uppercase tracking-[0.5em] text-zinc-500">Live Node Deployments</h4>
+                        <span id="evCount" class="text-red-500 font-mono text-sm font-bold bg-red-600/10 px-4 py-1.5 rounded">0</span>
+                    </div>
+                    <div id="activeEventsList" class="grid gap-6">
+                        <div class="text-center py-20 opacity-20 text-xs uppercase tracking-[1em]">Scanning core...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: ARCHIVE SYNC -->
+            <section id="archiveSection" class="glass-panel p-8 md:p-16">
+                <h3 class="text-2xl font-bold uppercase tracking-[0.4em] mb-12 border-b border-white/10 pb-8 text-center md:text-left">Archive <span class="text-red-600">Sync</span></h3>
+                <form id="galleryForm" class="space-y-10">
+                    <div class="grid md:grid-cols-2 gap-10">
+                        <div class="space-y-6">
+                            <div>
+                                <label class="text-[11px] text-zinc-500 uppercase mb-4 block tracking-[0.3em]">Visual Caption</label>
+                                <input type="text" id="galTitle" required placeholder="Data label...">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-zinc-500 uppercase mb-4 block tracking-[0.3em]">Log ID</label>
+                                <input type="text" id="galLog" placeholder="LOG_000">
+                            </div>
+                        </div>
+
+                        <!-- LOCAL IMAGE UPLOAD FOR GALLERY -->
+                        <div>
+                            <label class="text-[11px] text-zinc-500 uppercase mb-4 block font-bold">Source Image (Local)</label>
+                            <div class="file-upload-wrapper" id="galDropZone">
+                                <span id="galFileText" class="text-xs text-zinc-500 uppercase">Select Device Image</span>
+                                <input type="file" id="galFileInput" class="file-upload-input" accept="image/*">
+                                <img id="galPreview" class="preview-img hidden" src="">
+                            </div>
+                            <input type="hidden" id="galImageData">
+                        </div>
+                    </div>
+                    <button type="submit" id="galSubmitBtn" class="btn-red w-full md:w-auto px-16 py-4">Commit to Archive</button>
+                </form>
+            </section>
+
+            <!-- SECTION 3: SIGNALS -->
+            <section id="inquirySection" class="glass-panel p-8 md:p-16">
+                <div class="flex justify-between items-center mb-12 border-b border-white/10 pb-8">
+                    <h3 class="text-2xl font-bold uppercase tracking-[0.4em]">Signal <span class="text-red-600">Intercept</span></h3>
+                    <div class="text-xs font-mono text-red-500 bg-red-600/10 px-6 py-3 rounded border border-red-600/30">
+                        STREAMS: <span id="signalCount">00</span>
+                    </div>
+                </div>
+                <div id="inquiryStream" class="space-y-10 max-h-[800px] overflow-y-auto pr-6">
+                    <div class="text-center py-40 opacity-20 text-sm uppercase tracking-[1.5em]">Listening...</div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- FIREBASE MODULE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Environment Fallback
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'popetown-productions-llc';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyCJv9cd_QhzNiwC2_nDd4LwnMANhBOsET8",
+            authDomain: "popetown-productions-llc.firebaseapp.com",
+            projectId: "popetown-productions-llc",
+            storageBucket: "popetown-productions-llc.firebasestorage.app",
+            messagingSenderId: "436709069476",
+            appId: "1:436709069476:web:bbc0fcbe160b71fabccc31"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        let user = null;
+
+        // AUTH CONTROL
+        const passInput = document.getElementById('passInput');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const accessBarrier = document.getElementById('accessBarrier');
+        const adminContent = document.getElementById('adminContent');
+
+        verifyBtn.onclick = () => {
+            if(passInput.value === '1234') {
+                accessBarrier.classList.add('hidden');
+                adminContent.classList.remove('hidden');
+                startAdminApp();
+            } else {
+                alert('ACCESS_DENIED');
+            }
+        };
+
+        // IMAGE HANDLER LOGIC
+        const setupImageUploader = (inputId, previewId, dataId, textId) => {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            const dataInput = document.getElementById(dataId);
+            const text = document.getElementById(textId);
+
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    preview.src = event.target.result;
+                    preview.classList.remove('hidden');
+                    text.classList.add('hidden');
+                    dataInput.value = event.target.result; // Base64 String
+                };
+                reader.readAsDataURL(file);
+            };
+        };
+
+        setupImageUploader('evFileInput', 'evPreview', 'evImageData', 'evFileText');
+        setupImageUploader('galFileInput', 'galPreview', 'galImageData', 'galFileText');
+
+        // NAV INTERACTION
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuLinks = document.querySelectorAll('.menu-link');
+
+        menuToggle.onclick = () => mobileMenu.classList.toggle('open');
+        menuLinks.forEach(link => link.onclick = () => mobileMenu.classList.remove('open'));
+
+        async function startAdminApp() {
+            initThree();
+            // Auth Rule 3
+            const initAuth = async () => {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (e) { console.error("Auth Failure", e); }
+            };
+            await initAuth();
+            onAuthStateChanged(auth, (u) => {
+                user = u;
+                if(user) {
+                    initListeners();
+                    setupFormHandlers();
+                }
+            });
+        }
+
+        function initListeners() {
+            if (!user) return;
+            // RULE 1 Path Compliance
+            const eventsRef = collection(db, "artifacts", appId, "public", "data", "events");
+            onSnapshot(eventsRef, (snap) => {
+                const events = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                document.getElementById('evCount').innerText = events.length;
+                renderEventsList(events);
+            });
+
+            const inqRef = collection(db, "artifacts", appId, "public", "data", "inquiries");
+            onSnapshot(inqRef, (snap) => {
+                const inqs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                document.getElementById('signalCount').innerText = inqs.length.toString().padStart(2, '0');
+                renderInquiryFeed(inqs);
+            });
+        }
+
+        function renderEventsList(events) {
+            const list = document.getElementById('activeEventsList');
+            if(!events.length) {
+                list.innerHTML = '<div class="text-center py-12 opacity-20 text-xs uppercase tracking-widest">No Active Productions</div>';
+                return;
+            }
+            list.innerHTML = events.sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0)).map(ev => `
+                <div class="p-8 bg-white/5 border border-white/10 rounded flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="flex items-center gap-6 w-full">
+                        ${ev.imagePath ? `<img src="${ev.imagePath}" class="w-20 h-20 object-cover border border-white/20">` : `<div class="w-20 h-20 bg-zinc-900 border border-white/20 flex items-center justify-center text-[10px]">NO_IMG</div>`}
+                        <div class="text-left">
+                            <h4 class="text-lg font-bold uppercase tracking-widest text-white">${ev.title}</h4>
+                            <p class="text-[10px] text-zinc-500 uppercase tracking-widest mt-2">${ev.status} // ${ev.date ? new Date(ev.date.seconds*1000).toLocaleDateString() : 'NO_DATE'}</p>
+                        </div>
+                    </div>
+                    <button onclick="deleteRecord('events', '${ev.id}')" class="text-[10px] text-red-600 hover:text-white uppercase tracking-widest border border-red-600/30 px-6 py-3 hover:bg-red-600 transition-all font-black">Purge</button>
+                </div>
+            `).join('');
+        }
+
+        function renderInquiryFeed(inqs) {
+            const feed = document.getElementById('inquiryStream');
+            if(!inqs.length) {
+                feed.innerHTML = '<div class="text-center py-40 opacity-20 text-xs uppercase tracking-[2em]">Void</div>';
+                return;
+            }
+            feed.innerHTML = inqs.sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0)).map(i => `
+                <div class="p-10 bg-zinc-900 border border-white/10 space-y-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <span class="text-lg font-bold text-red-500 uppercase tracking-widest block">${i.fullName}</span>
+                            <span class="text-xs text-zinc-500 uppercase font-mono mt-1">${i.email}</span>
+                        </div>
+                        <span class="text-xs text-zinc-600 font-mono">${i.timestamp ? new Date(i.timestamp.seconds*1000).toLocaleString() : 'SIGNAL_STABLE'}</span>
+                    </div>
+                    <p class="text-[10px] bg-red-600/10 px-4 py-2 inline-block text-red-500 uppercase rounded-sm border border-red-600/20 font-black">${i.subject || 'GENERAL_DATA'}</p>
+                    <p class="text-lg text-zinc-300 leading-relaxed italic border-l-4 border-red-600/20 pl-8 font-light">"${i.message}"</p>
+                    <div class="pt-6 text-right">
+                        <button onclick="deleteRecord('inquiries', '${i.id}')" class="text-xs text-zinc-600 hover:text-red-500 uppercase tracking-[0.4em] font-black">Archive</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.deleteRecord = async (coll, id) => {
+            if(!user) return;
+            if(!confirm('PURGE RECORD PERMANENTLY?')) return;
+            try {
+                await deleteDoc(doc(db, "artifacts", appId, "public", "data", coll, id));
+            } catch(e) { console.error("Purge Error", e); }
+        };
+
+        function setupFormHandlers() {
+            const evForm = document.getElementById('eventForm');
+            evForm.onsubmit = async (e) => {
+                e.preventDefault();
+                if (!user) return;
+                const btn = document.getElementById('evSubmitBtn');
+                btn.disabled = true; btn.innerText = "UPLOADING...";
+                try {
+                    const dVal = document.getElementById('evDate').value;
+                    const imgData = document.getElementById('evImageData').value;
+                    await addDoc(collection(db, "artifacts", appId, "public", "data", "events"), {
+                        title: document.getElementById('evTitle').value,
+                        date: Timestamp.fromDate(new Date(dVal)),
+                        status: document.getElementById('evStatus').value,
+                        imagePath: imgData, // Stored as data string
+                        description: document.getElementById('evDesc').value,
+                        timestamp: serverTimestamp()
+                    });
+                    evForm.reset();
+                    document.getElementById('evPreview').classList.add('hidden');
+                    document.getElementById('evFileText').classList.remove('hidden');
+                } catch(err) { console.error("Link Interrupted", err); }
+                btn.disabled = false; btn.innerText = "Broadcast Signal";
+            };
+
+            const galForm = document.getElementById('galleryForm');
+            galForm.onsubmit = async (e) => {
+                e.preventDefault();
+                if (!user) return;
+                const btn = document.getElementById('galSubmitBtn');
+                btn.disabled = true; btn.innerText = "SYNCING...";
+                try {
+                    const imgData = document.getElementById('galImageData').value;
+                    await addDoc(collection(db, "artifacts", appId, "public", "data", "gallery"), {
+                        title: document.getElementById('galTitle').value,
+                        logId: document.getElementById('galLog').value,
+                        imageURL: imgData, // Stored as data string
+                        timestamp: serverTimestamp()
+                    });
+                    galForm.reset();
+                    document.getElementById('galPreview').classList.add('hidden');
+                    document.getElementById('galFileText').classList.remove('hidden');
+                } catch(err) { console.error("Archive Error", err); }
+                btn.disabled = false; btn.innerText = "Commit to Archive";
+            };
+        }
+
+        function initThree() {
+            const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000), ren = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            ren.setSize(window.innerWidth, window.innerHeight);
+            ren.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            document.getElementById('canvas-container').appendChild(ren.domElement);
+            const starGeo = new THREE.BufferGeometry(), sCnt = 1600, pArr = new Float32Array(sCnt*3);
+            for(let i=0; i<sCnt*3; i++) pArr[i] = (Math.random()-0.5)*20;
+            starGeo.setAttribute('position', new THREE.BufferAttribute(pArr, 3));
+            sc.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.005, color: 0xffffff, transparent: true, opacity: 0.4 })));
+            const cr = new THREE.Mesh(new THREE.IcosahedronGeometry(2.8, 1), new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true, transparent: true, opacity: 0.02 }));
+            sc.add(cr);
+            cam.position.z = 7;
+            let mx = 0, my = 0;
+            document.addEventListener('mousemove', (e) => { mx = (e.clientX-window.innerWidth/2)/800; my = (e.clientY-window.innerHeight/2)/800; });
+            function anim() { requestAnimationFrame(anim); cr.rotation.y += 0.0004; cam.position.x += (mx - cam.position.x) * 0.05; cam.position.y += (-my - cam.position.y) * 0.05; cam.lookAt(sc.position); ren.render(sc, cam); }
+            window.addEventListener('resize', () => { cam.aspect = window.innerWidth / window.innerHeight; cam.updateProjectionMatrix(); ren.setSize(window.innerWidth, window.innerHeight); });
+            anim();
+        }
+    </script>
+</body>
+</html>
