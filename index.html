@@ -13,7 +13,7 @@
         body { background-color: var(--bg-black); color: #ffffff; font-family: 'Inter', sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
         h1, h2, h3, .nav-item { font-family: 'Orbitron', sans-serif; }
         
-        /* Persistent Navigation Fix */
+        /* Persistent Navigation */
         #mainNav {
             position: fixed !important;
             top: 0 !important;
@@ -55,8 +55,15 @@
         }
         #mobileMenu.open { transform: translateX(0); }
 
-        .event-card { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden; }
-        .event-card:hover { transform: translateY(-10px); border-color: var(--brand-red); }
+        /* Hardware Accelerated Cards */
+        .event-card { 
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            overflow: hidden;
+            backface-visibility: hidden;
+            transform: translateZ(0);
+        }
+        .event-card:hover { transform: translateY(-10px) translateZ(0); border-color: var(--brand-red); }
         
         .gallery-track::-webkit-scrollbar { display: none; }
         .gallery-track { -ms-overflow-style: none; scrollbar-width: none; }
@@ -72,6 +79,19 @@
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;  
             overflow: hidden;
+        }
+
+        /* Image Optimization */
+        .high-res-img {
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            will-change: opacity;
+        }
+        .high-res-img.loaded {
+            opacity: 0.85; /* Balanced for quality and atmosphere */
+        }
+        .event-card:hover .high-res-img.loaded {
+            opacity: 1;
         }
     </style>
 </head>
@@ -134,9 +154,9 @@
 
         <!-- LIVE EVENTS SECTION -->
         <section id="events" class="py-24 px-6 max-w-7xl mx-auto">
-            <div class="text-center mb-20">
-                <h2 class="text-4xl md:text-6xl font-bold uppercase tracking-tighter">POPETOWN <span class="text-red-600">EVENTS</span></h2>
-                <div class="h-1 w-24 bg-red-600 mx-auto mt-6 mb-8 shadow-[0_0_15px_red]"></div>
+            <div class="text-center mb-20 text-left">
+                <h2 class="text-4xl md:text-6xl font-bold uppercase tracking-tighter text-white">POPETOWN <span class="text-red-600">EVENTS</span></h2>
+                <div class="h-1 w-24 bg-red-600 mt-6 mb-8 shadow-[0_0_15px_red]"></div>
                 <p class="text-zinc-500 uppercase text-xs tracking-[0.3em]">Engineering world-class musical experiences.</p>
             </div>
 
@@ -164,7 +184,7 @@
             <!-- VISUAL ARCHIVE CAROUSEL -->
             <div class="glass-panel p-8 mt-12">
                 <div class="flex justify-between items-center mb-8">
-                    <h3 class="text-xl font-bold uppercase tracking-widest text-white">Visual <span class="text-red-600">Archive</span></h3>
+                    <h3 class="text-xl font-bold uppercase tracking-widest text-white text-left">Visual <span class="text-red-600">Archive</span></h3>
                     <div class="flex space-x-4">
                         <button id="scrollLeft" class="border border-white/10 p-3 hover:border-red-600 transition rounded-full text-white">&larr;</button>
                         <button id="scrollRight" class="border border-white/10 p-3 hover:border-red-600 transition rounded-full text-white">&rarr;</button>
@@ -179,8 +199,8 @@
         <!-- MUSIC SCHOOL SECTION -->
         <section id="lessons" class="py-32 bg-zinc-950/50 px-6 border-y border-white/5">
             <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-                <div>
-                    <h2 class="text-3xl md:text-5xl font-bold mb-8 uppercase tracking-tighter">Music <span class="text-red-600">School</span></h2>
+                <div class="text-left">
+                    <h2 class="text-3xl md:text-5xl font-bold mb-8 uppercase tracking-tighter text-white">Music <span class="text-red-600">School</span></h2>
                     <p class="text-zinc-400 text-lg mb-10 leading-relaxed font-light">High-fidelity private instruction. We specialize in the absolute mastery of piano and select string performance.</p>
                     <div class="space-y-6">
                         <div class="p-6 glass-panel border-l-4 border-red-600">
@@ -268,6 +288,11 @@
         let unsubscribeEvents = null;
         let unsubscribeGallery = null;
 
+        // Optimized Image Decoder
+        window.onImgLoad = (el) => {
+            el.classList.add('loaded');
+        };
+
         // AUTH LOCK PROTOCOL (RULE 3)
         const performAuth = async () => {
             try {
@@ -302,7 +327,7 @@
             if (unsubscribeEvents) unsubscribeEvents();
             if (unsubscribeGallery) unsubscribeGallery();
 
-            // Sync Events - Path Compliance Rule 1
+            // Sync Events
             const evRef = collection(db, "artifacts", appId, "public", "data", "events");
             unsubscribeEvents = onSnapshot(evRef, (snap) => {
                 const evs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -312,7 +337,7 @@
                 console.error("Event Sync Interrupted", err);
             });
 
-            // Sync Gallery - Path Compliance Rule 1
+            // Sync Gallery
             const galRef = collection(db, "artifacts", appId, "public", "data", "gallery");
             unsubscribeGallery = onSnapshot(galRef, (snap) => {
                 const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -327,7 +352,6 @@
                 const btn = document.getElementById('formSubmit'), stat = document.getElementById('formStatus');
                 btn.disabled = true; btn.innerText = "LOGGING TRANSMISSION...";
                 try {
-                    // Only proceed if auth is confirmed
                     if (!auth.currentUser) throw new Error("Auth required");
                     
                     await addDoc(collection(db, "artifacts", appId, "public", "data", "inquiries"), {
@@ -341,7 +365,6 @@
                     stat.className = "mt-4 text-center text-[10px] uppercase text-green-500 block animate-pulse";
                     e.target.reset();
                 } catch(e) {
-                    console.error("Submission Error", e);
                     stat.innerText = "SIGNAL_INTERRUPTED // RETRY_LINK";
                     stat.className = "mt-4 text-center text-[10px] uppercase text-red-500 block";
                 }
@@ -357,23 +380,30 @@
                 grid.innerHTML = '<div class="col-span-full py-24 text-center opacity-30 text-xs uppercase tracking-[1em] font-black text-white">No Active Deployments Found</div>';
                 return;
             }
-            // Memory Sort: Rule 2
             const sorted = [...evs].sort((a,b) => (a.date?.seconds || 0) - (b.date?.seconds || 0));
-            grid.innerHTML = sorted.map(ev => `
-                <div class="event-card glass-panel">
-                    <div class="h-64 bg-zinc-900 flex items-center justify-center relative overflow-hidden">
-                        ${ev.imagePath ? `<img src="${ev.imagePath}" class="absolute inset-0 w-full h-full object-cover opacity-60">` : `<div class="text-zinc-800 text-6xl font-black uppercase">LIVE</div>`}
-                        <div class="absolute inset-0 bg-red-600/10 transition duration-500"></div>
-                        <div class="absolute top-4 right-4 bg-red-600 text-white text-[9px] font-black px-4 py-1.5 uppercase shadow-xl z-10">${ev.status || 'Upcoming'}</div>
+            grid.innerHTML = sorted.map(ev => {
+                const ticketAction = ev.ticketLink 
+                    ? `<a href="${ev.ticketLink}" target="_blank" rel="noopener noreferrer" class="mt-8 text-[10px] font-black uppercase border-b-2 border-red-600 pb-1 hover:text-red-500 transition-all tracking-[0.2em] text-white inline-block">Acquire Access</a>`
+                    : `<span class="mt-8 text-[10px] font-black uppercase border-b-2 border-zinc-700 pb-1 text-zinc-500 tracking-[0.2em] inline-block cursor-default">Access Pending</span>`;
+
+                return `
+                    <div class="event-card glass-panel flex flex-col h-full text-left">
+                        <div class="h-64 bg-zinc-900 flex items-center justify-center relative overflow-hidden flex-shrink-0">
+                            ${ev.imagePath ? `<img src="${ev.imagePath}" loading="lazy" onload="onImgLoad(this)" class="high-res-img absolute inset-0 w-full h-full object-cover">` : `<div class="text-zinc-800 text-6xl font-black uppercase">LIVE</div>`}
+                            <div class="absolute inset-0 bg-red-600/5 pointer-events-none"></div>
+                            <div class="absolute top-4 right-4 bg-red-600 text-white text-[9px] font-black px-4 py-1.5 uppercase shadow-xl z-10">${ev.status || 'Upcoming'}</div>
+                        </div>
+                        <div class="p-8 flex flex-col flex-grow">
+                            <span class="text-red-500 font-bold text-[10px] uppercase tracking-[0.3em]">${ev.date ? new Date(ev.date.seconds * 1000).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Date TBA'}</span>
+                            <h3 class="text-xl font-bold mt-2 uppercase tracking-tighter text-white">${ev.title}</h3>
+                            <p class="text-zinc-400 text-sm mt-4 leading-relaxed line-clamp-3 font-light flex-grow">${ev.description || 'Production briefing pending release.'}</p>
+                            <div class="mt-auto pt-6">
+                                ${ticketAction}
+                            </div>
+                        </div>
                     </div>
-                    <div class="p-8">
-                        <span class="text-red-500 font-bold text-[10px] uppercase tracking-[0.3em]">${ev.date ? new Date(ev.date.seconds * 1000).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Date TBA'}</span>
-                        <h3 class="text-xl font-bold mt-2 uppercase tracking-tighter text-white">${ev.title}</h3>
-                        <p class="text-zinc-400 text-sm mt-4 leading-relaxed line-clamp-3 font-light">${ev.description || 'Production briefing pending release.'}</p>
-                        <button class="mt-8 text-[10px] font-black uppercase border-b-2 border-red-600 pb-1 hover:text-red-500 transition-all tracking-[0.2em] text-white">Acquire Access</button>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function renderGallery(items) {
@@ -384,9 +414,9 @@
             }
             const sorted = [...items].sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
             track.innerHTML = sorted.map(item => `
-                <div class="min-w-[320px] md:min-w-[480px] aspect-video bg-zinc-900 border border-white/10 relative overflow-hidden group">
-                    <img src="${item.imageURL}" class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-all duration-1000">
-                    <div class="absolute inset-0 bg-red-600/10 opacity-30 group-hover:opacity-0 transition duration-500"></div>
+                <div class="min-w-[320px] md:min-w-[480px] aspect-video bg-zinc-900 border border-white/10 relative overflow-hidden group text-left">
+                    <img src="${item.imageURL}" loading="lazy" onload="onImgLoad(this)" class="high-res-img absolute inset-0 w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-red-600/10 opacity-30 group-hover:opacity-0 transition duration-500 pointer-events-none"></div>
                     <div class="absolute bottom-6 left-6 z-10">
                         <p class="text-[9px] font-bold text-red-500 uppercase tracking-[0.3em]">${item.logId || 'LOG_SYS'}</p>
                         <h4 class="text-lg font-bold uppercase tracking-tight text-white">${item.title}</h4>
@@ -407,7 +437,7 @@
             for (let i = 1; i <= days; i++) {
                 const d = document.createElement('div');
                 d.className = 'calendar-day p-2 flex flex-col justify-between text-[10px]';
-                d.innerHTML = `<span class="opacity-40 font-mono font-bold text-white">${i}</span>`;
+                d.innerHTML = `<span class="opacity-40 font-mono font-bold text-white text-left">${i}</span>`;
                 const dayEvs = events.filter(e => {
                     if (!e.date) return false;
                     const dObj = new Date(e.date?.seconds * 1000);
@@ -415,7 +445,7 @@
                 });
                 if(dayEvs.length) {
                     d.classList.add('has-event');
-                    d.innerHTML += `<div class="text-[7px] text-white uppercase font-black truncate mt-auto"><span class="event-dot mr-1"></span>${dayEvs[0].title}</div>`;
+                    d.innerHTML += `<div class="text-[7px] text-white uppercase font-black truncate mt-auto text-left"><span class="event-dot mr-1"></span>${dayEvs[0].title}</div>`;
                 }
                 if(i === new Date().getDate() && calDate.getMonth() === new Date().getMonth()) d.classList.add('today');
                 grid.appendChild(d);
@@ -451,9 +481,6 @@
             function anim() { 
                 requestAnimationFrame(anim); 
                 cr.rotation.y += 0.0003; 
-                cam.position.x += (0 - cam.position.x) * 0.05; 
-                cam.position.y += (0 - cam.position.y) * 0.05; 
-                cam.lookAt(sc.position); 
                 ren.render(sc, cam); 
             }
             anim();

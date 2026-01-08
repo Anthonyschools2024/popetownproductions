@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POPETOWN Admin | Command Center v3.6</title>
+    <title>POPETOWN Admin | Command Center v4.0</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Three.js -->
@@ -16,6 +16,7 @@
         :root {
             --brand-red: #ff0000;
             --bg-black: #050505;
+            --panel-bg: rgba(10, 10, 10, 0.95);
         }
         body {
             background-color: var(--bg-black);
@@ -28,13 +29,11 @@
         
         #adminNav {
             position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 80px !important;
+            top: 0 !important; left: 0 !important;
+            width: 100% !important; height: 80px !important;
             z-index: 9999; 
-            background: rgba(0, 0, 0, 0.95) !important;
-            backdrop-filter: blur(20px);
+            background: rgba(0, 0, 0, 0.98) !important;
+            backdrop-filter: blur(25px);
             border-bottom: 1px solid rgba(255, 0, 0, 0.3);
             display: none; 
             align-items: center;
@@ -42,124 +41,122 @@
         }
 
         .glass-panel {
-            background: rgba(10, 10, 10, 0.9);
+            background: var(--panel-bg);
             border: 1px solid rgba(255, 0, 0, 0.15);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            border-radius: 2px;
-            transition: border 0.3s ease;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            border-radius: 4px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        .glass-panel:hover { border-color: rgba(255, 0, 0, 0.5); }
 
         .neon-accent {
             color: var(--brand-red);
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
         }
 
         .btn-red {
             background: var(--brand-red);
             color: white;
-            padding: 12px 24px;
+            padding: 14px 28px;
             text-transform: uppercase;
             font-weight: 700;
-            letter-spacing: 2px;
-            transition: 0.3s;
+            letter-spacing: 3px;
+            transition: 0.4s;
             cursor: pointer;
             border: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 10px;
+            font-size: 11px;
         }
 
         .btn-red:hover:not(:disabled) {
-            box-shadow: 0 0 25px rgba(255, 0, 0, 0.6);
-            transform: translateY(-1px);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.7);
+            filter: brightness(1.2);
         }
         
-        .btn-red:disabled { opacity: 0.5; cursor: wait; }
+        .btn-red:disabled { opacity: 0.3; cursor: wait; }
 
         .nav-link {
-            color: #888;
-            font-size: 11px;
-            font-weight: 700;
+            color: #666;
+            font-size: 10px;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 2px;
             transition: 0.3s;
+            padding: 10px 15px;
         }
-
-        .nav-link:hover { color: var(--brand-red); }
+        .nav-link:hover { color: white; background: rgba(255, 0, 0, 0.1); }
 
         .file-upload-wrapper {
-            border: 1px dashed rgba(255, 0, 0, 0.2);
-            height: 180px;
+            border: 2px dashed rgba(255, 0, 0, 0.1);
+            height: 220px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.02);
-            cursor: pointer;
+            background: rgba(255, 255, 255, 0.01);
             position: relative;
             overflow: hidden;
-            transition: background 0.3s;
+            transition: 0.3s;
         }
-        .file-upload-wrapper:hover { background: rgba(255, 0, 0, 0.05); }
+
+        .asset-actions {
+            position: absolute;
+            top: 15px; right: 15px;
+            display: flex; gap: 10px;
+            z-index: 50;
+        }
+
+        .asset-btn {
+            background: rgba(0,0,0,0.9);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white; padding: 8px;
+            border-radius: 4px; cursor: pointer;
+            transition: 0.2s;
+        }
+        .asset-btn:hover { background: #ff0000; border-color: #ff0000; }
 
         .progress-container {
-            width: 100%;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            position: absolute;
-            bottom: 0;
-            left: 0;
+            width: 100%; height: 6px;
+            background: rgba(0,0,0,0.4);
+            position: absolute; bottom: 0; left: 0;
         }
         .progress-bar {
-            height: 100%;
-            background: var(--brand-red);
-            width: 0%;
-            transition: width 0.1s;
-            box-shadow: 0 0 10px var(--brand-red);
+            height: 100%; background: var(--brand-red);
+            width: 0%; transition: width 0.2s;
+            box-shadow: 0 0 15px var(--brand-red);
         }
 
         #canvas-container {
-            position: fixed;
-            top: 0; left: 0; z-index: -1;
-            width: 100%; height: 100%;
-            pointer-events: none;
+            position: fixed; top: 0; left: 0; z-index: -1;
+            width: 100%; height: 100%; pointer-events: none;
         }
 
         input, textarea, select {
-            background: rgba(20, 20, 20, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 0.75rem;
-            outline: none;
-            width: 100%;
+            background: rgba(15, 15, 15, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: white; padding: 1rem;
+            outline: none; width: 100%;
+            font-size: 13px;
         }
-        input:focus { border-color: var(--brand-red); }
+        input:focus { border-color: var(--brand-red); background: rgba(20, 20, 20, 1); }
 
         #accessBarrier {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: fixed; inset: 0;
+            background: #000; z-index: 10000;
+            display: flex; align-items: center; justify-content: center;
         }
 
         .error-toast {
-            background: #ff0000;
-            color: white;
-            padding: 1rem 2rem;
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 11000;
-            font-size: 10px;
-            font-weight: 900;
-            text-transform: uppercase;
-            display: none;
-            box-shadow: 0 0 30px rgba(255,0,0,0.4);
-            max-width: 450px;
-            border-left: 4px solid white;
+            background: #000; color: #ff0000;
+            padding: 1.5rem; position: fixed;
+            bottom: 2rem; right: 2rem; z-index: 11000;
+            font-size: 10px; font-weight: 900;
+            text-transform: uppercase; display: none;
+            border: 1px solid #ff0000;
+            box-shadow: 0 0 40px rgba(255,0,0,0.3);
         }
 
         .hidden { display: none !important; }
@@ -174,159 +171,224 @@
 
     <!-- SECURITY BARRIER -->
     <div id="accessBarrier">
-        <div class="glass-panel p-12 max-w-md w-full text-center border-t-4 border-red-600">
-            <h2 class="text-3xl font-bold mb-2 uppercase tracking-tighter">POPETOWN <span class="text-red-600">ADMIN</span></h2>
-            <p class="text-[10px] text-zinc-500 uppercase tracking-[0.4em] mb-10">System Initialization Required</p>
+        <div class="glass-panel p-16 max-w-lg w-full text-center border-t-[6px] border-red-600">
+            <h2 class="text-4xl font-black mb-2 uppercase tracking-tighter italic">POPETOWN <span class="text-red-600">ADMIN</span></h2>
+            <p class="text-[10px] text-zinc-500 uppercase tracking-[0.5em] mb-12">Authorized Personnel Access Only</p>
             
-            <form id="loginForm" class="space-y-4 text-left">
-                <div>
-                    <label class="text-[10px] uppercase text-zinc-500 font-bold mb-1 block">Staff Identification</label>
-                    <input type="email" id="loginEmail" placeholder="EMAIL" required>
+            <form id="loginForm" class="space-y-6 text-left">
+                <div class="space-y-2">
+                    <label class="text-[9px] uppercase text-zinc-600 font-black tracking-widest ml-1">Staff ID / Email</label>
+                    <input type="email" id="loginEmail" placeholder="ID_ALPHA_01" required class="font-mono text-white">
                 </div>
-                <div>
-                    <input type="password" id="loginPass" placeholder="ACCESS KEY" required>
+                <div class="space-y-2">
+                    <label class="text-[9px] uppercase text-zinc-600 font-black tracking-widest ml-1">Access Cipher</label>
+                    <input type="password" id="loginPass" placeholder="••••••••" required class="text-white">
                 </div>
-                <button type="submit" id="loginBtn" class="btn-red w-full mt-4">Establish Uplink</button>
+                <button type="submit" id="loginBtn" class="btn-red w-full mt-6 shadow-2xl">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i> Establish Secure Uplink
+                </button>
             </form>
-            <div id="initStatus" class="mt-6 text-[9px] font-mono text-zinc-700 uppercase tracking-widest">Awaiting Pulse...</div>
+            <div id="initStatus" class="mt-10 text-[9px] font-mono text-zinc-800 uppercase tracking-[0.2em] animate-pulse">Scanning Grid Pulse...</div>
         </div>
     </div>
 
     <!-- COMMAND CENTER -->
     <div id="adminContent" class="hidden">
         <header id="adminNav">
-            <div class="max-w-7xl mx-auto w-full flex justify-between items-center px-4">
-                <div class="flex items-center gap-10">
-                    <div class="text-xl font-bold tracking-tighter uppercase cursor-pointer">
-                        POPETOWN <span class="neon-accent">CMD</span>
+            <div class="max-w-screen-2xl mx-auto w-full flex justify-between items-center px-8">
+                <div class="flex items-center gap-12">
+                    <div class="text-2xl font-black tracking-tighter uppercase italic cursor-pointer group">
+                        POPETOWN <span class="neon-accent group-hover:animate-pulse">CMD</span>
                     </div>
-                    <nav class="hidden md:flex gap-8">
-                        <a href="#eventSection" class="nav-link">Events</a>
+                    <nav class="hidden lg:flex gap-4">
+                        <a href="#eventSection" class="nav-link">Production</a>
                         <a href="#archiveSection" class="nav-link">Archive</a>
                         <a href="#signalSection" class="nav-link">Signals</a>
                     </nav>
                 </div>
-                <div class="flex items-center gap-6">
-                    <div class="relative hidden lg:block">
-                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
-                        <input type="text" id="globalSearch" placeholder="SEARCH GRID..." class="pl-10 text-[10px] py-2 bg-white/5 border-white/10 w-64 rounded-sm font-bold uppercase tracking-widest focus:border-red-600">
+                <div class="flex items-center gap-8">
+                    <div class="relative hidden xl:block">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600"></i>
+                        <input type="text" id="globalSearch" placeholder="SEARCH CORE DATABASE..." class="pl-12 text-[10px] py-3 bg-white/5 border-white/5 w-80 rounded-sm font-bold uppercase tracking-widest focus:border-red-600">
                     </div>
-                    <button id="logoutBtn" class="text-[10px] text-zinc-500 hover:text-red-500 uppercase border border-white/10 px-4 py-2 hover:border-red-600 transition-all font-bold">
+                    <button id="logoutBtn" class="text-[9px] text-zinc-500 hover:text-white uppercase border border-white/5 px-6 py-2 hover:bg-red-600/20 hover:border-red-600 transition-all font-black tracking-tighter">
                         TERMINATE_LINK
                     </button>
                 </div>
             </div>
         </header>
 
-        <main class="pt-32 pb-20 px-6 max-w-7xl mx-auto space-y-20">
-            <div class="flex flex-col md:flex-row justify-between items-end gap-6">
-                <div>
-                    <h1 class="text-4xl md:text-6xl font-bold uppercase tracking-tighter">COMMAND <span class="text-red-600">INTERFACE</span></h1>
-                    <p id="userDisplay" class="text-[10px] text-zinc-500 mt-2 tracking-[0.3em] uppercase italic font-bold">Uplink Stable</p>
+        <main class="pt-36 pb-32 px-8 max-w-screen-2xl mx-auto space-y-24">
+            <!-- Analytics -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-2 text-left">
+                    <h1 class="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none italic">COMMAND<br><span class="text-red-600">TERMINAL</span></h1>
+                    <p id="userDisplay" class="text-[11px] text-zinc-500 mt-4 tracking-[0.4em] uppercase font-bold border-l-2 border-red-600 pl-4">System Operational // Link Stable</p>
                 </div>
-                <div class="flex flex-col items-end gap-1">
-                    <div id="nodeStatus" class="text-[9px] font-mono bg-zinc-900 px-4 py-1 border border-white/5 text-zinc-500 uppercase">DB: Syncing...</div>
-                    <div id="storageStatus" class="text-[9px] font-mono bg-zinc-900 px-4 py-1 border border-white/5 text-zinc-500 uppercase">Storage: Checking...</div>
+                <div class="glass-panel p-6 flex flex-col justify-center text-left">
+                    <p class="text-[9px] text-zinc-500 uppercase font-black tracking-widest mb-1">Active Nodes</p>
+                    <div class="flex items-baseline gap-2">
+                        <span id="statEvents" class="text-4xl font-black text-white">00</span>
+                        <span class="text-red-600 text-xs font-mono">/ LIVE</span>
+                    </div>
+                </div>
+                <div class="glass-panel p-6 flex flex-col justify-center text-left">
+                    <p class="text-[9px] text-zinc-500 uppercase font-black tracking-widest mb-1">Intercepted Signals</p>
+                    <div class="flex items-baseline gap-2">
+                        <span id="statSignals" class="text-4xl font-black text-white">00</span>
+                        <span class="text-zinc-600 text-xs font-mono">/ TOTAL</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- EVENTS -->
-            <section id="eventSection" class="space-y-8">
-                <div class="glass-panel p-8 md:p-12">
-                    <h3 class="text-xl font-bold uppercase tracking-widest mb-10 border-b border-white/5 pb-6 flex items-center gap-4">
-                        <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span> Event Deployment
-                    </h3>
-                    <form id="eventForm" class="grid md:grid-cols-2 gap-8">
-                        <input type="hidden" id="editEventId">
-                        <div class="space-y-6">
-                            <input type="text" id="evTitle" placeholder="PRODUCTION TITLE" required>
+            <!-- PRODUCTION GRID -->
+            <section id="eventSection" class="space-y-12">
+                <div class="flex justify-between items-end border-b border-white/5 pb-8">
+                    <div class="text-left">
+                        <h2 class="text-2xl font-black uppercase tracking-widest text-white">Production <span class="text-red-600">Grid</span></h2>
+                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2 italic">Deploy and manage live event nodes and ticketing links</p>
+                    </div>
+                    <div id="nodeStatus" class="text-[9px] font-mono bg-zinc-900 px-6 py-2 border border-white/5 text-zinc-500 uppercase tracking-widest">Network: Syncing...</div>
+                </div>
+
+                <div class="grid xl:grid-cols-3 gap-12 items-start">
+                    <!-- Form -->
+                    <div class="xl:col-span-1 glass-panel p-10 space-y-8 sticky top-36">
+                        <h3 class="text-sm font-black uppercase tracking-[0.3em] flex items-center gap-3">
+                            <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span> Node Uplink
+                        </h3>
+                        <form id="eventForm" class="space-y-6">
+                            <input type="hidden" id="editEventId">
+                            <input type="text" id="evTitle" placeholder="PRODUCTION TITLE" required class="text-lg font-bold text-white">
+                            
                             <div class="grid grid-cols-2 gap-4">
-                                <input type="date" id="evDate" required>
-                                <select id="evStatus">
+                                <input type="date" id="evDate" required class="text-white">
+                                <select id="evStatus" class="text-white">
                                     <option value="Upcoming">UPCOMING</option>
                                     <option value="Live Now">LIVE NOW</option>
                                     <option value="Sold Out">SOLD OUT</option>
                                     <option value="Exclusive">EXCLUSIVE</option>
                                 </select>
                             </div>
-                            <textarea id="evDesc" rows="4" placeholder="TECHNICAL BRIEFING..."></textarea>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="file-upload-wrapper" id="evDropZone" onclick="document.getElementById('evFile').click()">
-                                <p id="evFileLabel" class="text-[10px] text-zinc-500 uppercase font-bold text-center px-4">Drop High-Res Asset (Up to 500MB)<br><span class="opacity-50 mt-1 block">Uplink to Cloud Storage</span></p>
-                                <img id="evPreview" class="hidden h-full w-full object-contain p-2">
-                                <input type="file" id="evFile" class="hidden">
+
+                            <input type="url" id="evTicketLink" placeholder="ADD TICKET PORTAL LINK (OPTIONAL)" class="font-mono text-xs text-white">
+
+                            <textarea id="evDesc" rows="4" placeholder="TECHNICAL BRIEFING DATA..." class="custom-scrollbar text-white"></textarea>
+                            
+                            <div class="file-upload-wrapper group" id="evDropZone">
+                                <div id="evImageActions" class="asset-actions hidden">
+                                    <button type="button" onclick="window.clearAsset('ev')" class="asset-btn" title="Delete Asset">
+                                        <i data-lucide="trash-2" class="w-4 h-4 text-white"></i>
+                                    </button>
+                                </div>
+                                <div id="evPrompt" class="flex flex-col items-center justify-center p-6 text-center cursor-pointer" onclick="document.getElementById('evFile').click()">
+                                    <p class="text-[9px] text-zinc-500 uppercase font-black leading-relaxed">
+                                        Broadcast Visual Asset<br>
+                                        <span class="text-red-600 opacity-60">(Binary Uplink Support: 500MB)</span>
+                                    </p>
+                                </div>
+                                <img id="evPreview" class="hidden h-full w-full object-cover">
                                 <div id="evProgressContainer" class="progress-container hidden">
                                     <div id="evProgressBar" class="progress-bar"></div>
                                 </div>
                             </div>
+                            
                             <input type="hidden" id="evImageData"> 
-                            <div class="flex gap-4">
-                                <button type="submit" id="evBtn" class="btn-red flex-1 py-4 mt-2">
-                                    <i data-lucide="send" class="w-4 h-4"></i>
-                                    Broadcast Signal
-                                </button>
-                                <button type="button" id="evCancelBtn" class="hidden text-[10px] text-zinc-500 uppercase tracking-widest border border-white/10 px-6 py-2 mt-2 hover:bg-white/5">Cancel Edit</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
 
-                <div class="glass-panel p-8">
-                    <div class="flex justify-between items-center mb-6">
-                        <h4 class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Active Deployments</h4>
-                        <span id="evCount" class="text-red-500 font-mono text-xs">00</span>
+                            <div class="flex flex-col gap-4">
+                                <button type="submit" id="evBtn" class="btn-red w-full py-5">
+                                    <i data-lucide="zap" class="w-4 h-4"></i> Commit Broadcast
+                                </button>
+                                <button type="button" id="evCancelBtn" class="hidden text-[9px] text-zinc-600 hover:text-white uppercase tracking-widest border border-white/10 px-6 py-2 hover:bg-white/5">ABORT_EDIT</button>
+                            </div>
+                        </form>
                     </div>
-                    <div id="eventList" class="grid gap-4">
-                        <div class="text-center py-10 opacity-20 text-[10px] uppercase tracking-[1em]">Establishing Link...</div>
+
+                    <!-- List -->
+                    <div class="xl:col-span-2 space-y-6">
+                        <div id="eventList" class="grid gap-6">
+                            <div class="py-20 text-center text-[10px] text-zinc-800 uppercase tracking-[1em] animate-pulse">Establishing Database Link...</div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- ARCHIVE -->
-            <section id="archiveSection" class="glass-panel p-8 md:p-12">
-                <h3 class="text-xl font-bold uppercase tracking-widest mb-10 border-b border-white/5 pb-6">Archive <span class="text-red-600">Synchronization</span></h3>
-                <form id="galleryForm" class="grid md:grid-cols-2 gap-8">
-                    <div class="space-y-4">
-                        <input type="text" id="galTitle" placeholder="DATA LABEL" required>
-                        <input type="text" id="galLog" placeholder="LOG_ID (e.g. CORE_001)">
-                        <button type="submit" id="galBtn" class="btn-red w-full py-4 mt-2">Commit to Archive</button>
+            <!-- ARCHIVE MANAGEMENT -->
+            <section id="archiveSection" class="space-y-12">
+                <div class="flex justify-between items-end border-b border-white/5 pb-8">
+                    <div class="text-left">
+                        <h2 class="text-2xl font-black uppercase tracking-widest text-white">Archive <span class="text-red-600">Core</span></h2>
+                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2 italic">Permanent capture synchronization and media asset management</p>
                     </div>
-                    <div class="file-upload-wrapper" id="galDropZone" onclick="document.getElementById('galFile').click()">
-                        <p id="galFileLabel" class="text-[10px] text-zinc-500 uppercase font-bold text-center px-4">Drop High-Res Archive Capture<br><span class="opacity-50 mt-1 block">Direct Cloud Synchronization</span></p>
-                        <img id="galPreview" class="hidden h-full w-full object-contain p-2">
-                        <input type="file" id="galFile" class="hidden">
-                        <div id="galProgressContainer" class="progress-container hidden">
-                            <div id="galProgressBar" class="progress-bar"></div>
+                </div>
+                
+                <div class="grid lg:grid-cols-3 gap-12">
+                    <!-- Form -->
+                    <div class="lg:col-span-1 glass-panel p-10 space-y-8">
+                        <h3 class="text-sm font-black uppercase tracking-[0.3em]">New Capture</h3>
+                        <form id="galleryForm" class="space-y-6">
+                            <input type="text" id="galTitle" placeholder="DATA RECORD LABEL" required class="text-white">
+                            <input type="text" id="galLog" placeholder="LOG_INDEX (e.g. CORE_01)" class="font-mono text-white">
+                            
+                            <div class="file-upload-wrapper group" id="galDropZone">
+                                <div id="galImageActions" class="asset-actions hidden">
+                                    <button type="button" onclick="window.clearAsset('gal')" class="asset-btn">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                                <div id="galPrompt" class="flex flex-col items-center justify-center p-8 text-center cursor-pointer" onclick="document.getElementById('galFile').click()">
+                                    <p class="text-[9px] text-zinc-500 uppercase font-black leading-relaxed">
+                                        Upload Capture Metadata<br>
+                                        <span class="text-red-600 opacity-60">(Resumable Sync Active)</span>
+                                    </p>
+                                </div>
+                                <img id="galPreview" class="hidden h-full w-full object-cover">
+                                <div id="galProgressContainer" class="progress-container hidden">
+                                    <div id="galProgressBar" class="progress-bar"></div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="galImageData">
+                            <button type="submit" id="galBtn" class="btn-red w-full py-5">
+                                <i data-lucide="hard-drive" class="w-4 h-4"></i> Commit Archive
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Archive List -->
+                    <div class="lg:col-span-2">
+                        <div id="archiveList" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <!-- Archived images go here -->
                         </div>
                     </div>
-                    <input type="hidden" id="galImageData">
-                </form>
+                </div>
             </section>
 
             <!-- SIGNALS -->
-            <section id="signalSection" class="glass-panel p-8 md:p-12">
-                <div class="flex justify-between items-center mb-10 border-b border-white/5 pb-6">
-                    <h3 class="text-xl font-bold uppercase tracking-widest">Signal Intercept</h3>
-                    <div class="flex items-center gap-6">
-                        <div class="text-[10px] font-mono text-red-500 bg-red-600/5 px-4 py-2 border border-red-600/10 uppercase tracking-widest">Received: <span id="sigCount">00</span></div>
+            <section id="signalSection" class="space-y-12">
+                <div class="flex justify-between items-end border-b border-white/5 pb-8 text-left">
+                    <div>
+                        <h2 class="text-2xl font-black uppercase tracking-widest text-white">Signal <span class="text-red-600">Intercept</span></h2>
+                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2">Communications intercepted from the grid terminal</p>
                     </div>
                 </div>
-                <div id="signalList" class="space-y-6 max-h-[800px] overflow-y-auto pr-4 custom-scrollbar">
-                    <div class="text-center py-20 opacity-20 text-[10px] uppercase tracking-[1em]">Listening...</div>
+                <div id="signalList" class="grid grid-cols-1 xl:grid-cols-2 gap-8 max-h-[1200px] overflow-y-auto pr-4 custom-scrollbar">
+                    <!-- Signals injected here -->
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- FIREBASE & LOGIC -->
+    <!-- Hidden inputs for file interaction -->
+    <input type="file" id="evFile" class="hidden">
+    <input type="file" id="galFile" class="hidden">
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        // CONFIG (Rule 3.6 Path-Aligned)
+        // APP INIT
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyCJv9cd_QhzNiwC2_nDd4LwnMANhBOsET8",
             authDomain: "popetown-productions-llc.firebaseapp.com",
@@ -346,420 +408,300 @@
 
         let activeListeners = [];
         let isStaffAuthorized = false;
-        let masterData = { events: [], signals: [] };
+        let masterData = { events: [], signals: [], archive: [] };
 
         const toast = (msg) => {
             const el = document.getElementById('errorToast');
             el.innerText = msg; el.style.display = 'block';
-            setTimeout(() => el.style.display = 'none', 12000); // Longer display for complex errors
+            setTimeout(() => el.style.display = 'none', 6000);
         };
 
-        const stopListeners = () => {
-            activeListeners.forEach(unsub => unsub());
-            activeListeners = [];
+        const toggleInterface = (isAuthorized) => {
+            isStaffAuthorized = isAuthorized;
+            document.getElementById('accessBarrier').classList.toggle('hidden', isAuthorized);
+            document.getElementById('adminContent').classList.toggle('hidden', !isAuthorized);
+            document.getElementById('adminNav').style.display = isAuthorized ? 'flex' : 'none';
+            if (isAuthorized) { initThree(); startStreams(); }
+            else activeListeners.forEach(u => u());
         };
 
-        // UI STATE CONTROL
-        function toggleInterface(isAuthorized) {
-            const barrier = document.getElementById('accessBarrier');
-            const content = document.getElementById('adminContent');
-            const nav = document.getElementById('adminNav');
-
-            if (isAuthorized) {
-                barrier.classList.add('hidden');
-                content.classList.remove('hidden');
-                nav.style.display = 'flex';
-                initThree();
-                startDatabaseStreams();
-            } else {
-                barrier.classList.remove('hidden');
-                content.classList.add('hidden');
-                nav.style.display = 'none';
-                stopListeners();
-            }
-        }
-
-        const refreshIcons = () => {
-            if (typeof lucide !== 'undefined' && lucide.createIcons) {
-                lucide.createIcons();
-            }
-        };
-
-        // DB SYNCHRONIZATION
-        function startDatabaseStreams() {
+        function startStreams() {
             if (!auth.currentUser) return;
-            
             const nodeStatus = document.getElementById('nodeStatus');
-            const storageStatus = document.getElementById('storageStatus');
-            
-            nodeStatus.innerText = "DB: Syncing...";
-            storageStatus.innerText = "Storage: Ready";
-            storageStatus.className = "text-[9px] font-mono bg-zinc-900 px-4 py-1 border border-white/5 text-green-500 uppercase";
-
             const paths = {
                 events: collection(db, 'artifacts', appId, 'public', 'data', 'events'),
-                signals: collection(db, 'artifacts', appId, 'public', 'data', 'inquiries')
+                signals: collection(db, 'artifacts', appId, 'public', 'data', 'inquiries'),
+                archive: collection(db, 'artifacts', appId, 'public', 'data', 'gallery')
             };
 
-            const unsubEv = onSnapshot(paths.events, (snap) => {
+            activeListeners.push(onSnapshot(paths.events, (snap) => {
                 masterData.events = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                document.getElementById('statEvents').innerText = masterData.events.length.toString().padStart(2, '0');
                 renderEvents();
-                nodeStatus.innerText = "DB: Stable";
-                nodeStatus.className = "text-[9px] font-mono bg-zinc-900 px-4 py-1 border border-white/5 text-green-500 uppercase";
-            }, (err) => {
-                nodeStatus.innerText = "DB: Permission Fail";
-                nodeStatus.className = "text-[9px] font-mono bg-zinc-900 px-4 py-1 border border-white/5 text-red-500 uppercase";
-            });
-            activeListeners.push(unsubEv);
+                nodeStatus.innerText = "Network: Stable";
+                nodeStatus.className = "text-[9px] font-mono bg-zinc-900 px-6 py-2 border border-green-500/20 text-green-500 uppercase tracking-widest";
+            }));
 
-            const unsubSig = onSnapshot(paths.signals, (snap) => {
+            activeListeners.push(onSnapshot(paths.signals, (snap) => {
                 masterData.signals = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                document.getElementById('statSignals').innerText = masterData.signals.length.toString().padStart(2, '0');
                 renderSignals();
-            });
-            activeListeners.push(unsubSig);
+            }));
+
+            activeListeners.push(onSnapshot(paths.archive, (snap) => {
+                masterData.archive = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderArchive();
+            }));
         }
 
         function renderEvents() {
             const list = document.getElementById('eventList');
-            const query = document.getElementById('globalSearch')?.value?.toLowerCase() || '';
-            const filtered = masterData.events.filter(e => e.title?.toLowerCase().includes(query) || e.status?.toLowerCase().includes(query));
-            
-            document.getElementById('evCount').innerText = filtered.length.toString().padStart(2, '0');
+            const q = document.getElementById('globalSearch')?.value?.toLowerCase() || '';
+            const filtered = masterData.events.filter(e => e.title?.toLowerCase().includes(q) || e.status?.toLowerCase().includes(q));
             
             if (filtered.length === 0) {
-                list.innerHTML = `<div class="py-10 text-center text-[10px] text-zinc-700 uppercase">Archive Void // No Matching Nodes</div>`;
+                list.innerHTML = `<div class="py-20 text-center text-[10px] text-zinc-800 uppercase tracking-[1em]">Void Node: No Match</div>`;
                 return;
             }
 
             list.innerHTML = filtered.map(item => {
-                const dateStr = item.date?.toDate ? item.date.toDate().toLocaleDateString() : 'NO_DATE';
+                const badgeClass = item.status === 'Live Now' ? 'border-red-600 text-red-500' : 'border-green-600 text-green-500';
                 return `
-                    <div class="p-6 bg-white/5 border border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 group hover:border-red-600 transition-all">
-                        <div class="flex items-center gap-6 w-full text-left">
-                            <div class="w-16 h-16 bg-black border border-white/10 flex-shrink-0">
-                                ${item.imagePath ? `<img src="${item.imagePath}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-[8px] opacity-20">NO_IMG</div>`}
+                    <div class="glass-panel p-8 flex flex-col md:flex-row justify-between items-center gap-8 group text-left relative overflow-hidden">
+                        <div class="flex items-center gap-8 w-full">
+                            <div class="w-24 h-24 bg-black border border-white/5 flex-shrink-0 overflow-hidden relative">
+                                ${item.imagePath ? `<img src="${item.imagePath}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">` : `<div class="w-full h-full flex items-center justify-center text-[8px] opacity-10">NULL</div>`}
                             </div>
-                            <div>
-                                <h4 class="text-sm font-bold uppercase tracking-widest text-white group-hover:text-red-500 transition-colors">${item.title}</h4>
-                                <p class="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">${item.status} // ${dateStr}</p>
+                            <div class="space-y-2 flex-1">
+                                <span class="px-2 py-0.5 rounded-full border ${badgeClass} text-[8px] font-black uppercase tracking-widest">${item.status}</span>
+                                <h4 class="text-xl font-black uppercase tracking-tighter text-white group-hover:text-red-500 transition-colors italic">${item.title}</h4>
+                                <p class="text-[9px] text-zinc-500 uppercase font-mono tracking-widest">LOG: ${item.id.slice(0,8)}</p>
+                                ${item.ticketLink ? `<a href="${item.ticketLink}" target="_blank" class="inline-block text-[9px] text-red-500 font-black uppercase tracking-widest border-b border-red-600/30 hover:border-red-600 mt-2">:: ACCESS_PORTAL</a>` : ''}
                             </div>
                         </div>
-                        <div class="flex gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="window.editEvent('${item.id}')" class="text-[8px] text-zinc-400 hover:text-white uppercase tracking-widest border border-white/10 px-6 py-2 hover:bg-white/5 font-bold">EDIT</button>
-                            <button onclick="window.purge('events', '${item.id}')" class="text-[8px] text-zinc-600 hover:text-white uppercase tracking-widest border border-white/10 px-6 py-2 hover:bg-red-600 font-bold">PURGE</button>
+                        <div class="flex md:flex-col gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="window.editNode('${item.id}')" class="text-[9px] text-white uppercase border border-white/10 px-8 py-3 hover:bg-white/5 font-black tracking-widest">EDIT</button>
+                            <button onclick="window.clearNodeImage('${item.id}')" class="text-[9px] text-zinc-400 uppercase border border-white/5 px-8 py-3 hover:text-red-500 font-black tracking-widest">PURGE_PHOTO</button>
+                            <button onclick="window.purgeNode('events', '${item.id}')" class="text-[9px] text-white uppercase bg-red-600/10 border border-red-600/20 px-8 py-3 hover:bg-red-600 font-black tracking-widest">TERMINATE</button>
                         </div>
                     </div>
                 `;
             }).join('');
-            refreshIcons();
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function renderArchive() {
+            const list = document.getElementById('archiveList');
+            if (masterData.archive.length === 0) {
+                list.innerHTML = `<div class="col-span-2 py-10 text-center text-[9px] text-zinc-700 uppercase tracking-widest">Archive Void</div>`;
+                return;
+            }
+            list.innerHTML = masterData.archive.map(i => `
+                <div class="glass-panel group relative aspect-square overflow-hidden bg-black">
+                    <img src="${i.imageURL}" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent p-6 flex flex-col justify-end">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-white">${i.title}</p>
+                        <p class="text-[8px] font-mono text-zinc-500 mt-1 uppercase">${i.logId || 'UNTAGGED'}</p>
+                        <div class="mt-4 flex gap-2 translate-y-10 group-hover:translate-y-0 transition-transform">
+                            <button onclick="window.purgeNode('gallery', '${i.id}')" class="bg-red-600 text-white p-2 rounded hover:bg-red-500 transition-colors">
+                                <i data-lucide="trash-2" class="w-3 h-3"></i>
+                            </button>
+                            <a href="${i.imageURL}" target="_blank" class="bg-white/10 text-white p-2 rounded hover:bg-white/20 transition-colors">
+                                <i data-lucide="external-link" class="w-3 h-3"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            if (window.lucide) lucide.createIcons();
         }
 
         function renderSignals() {
             const list = document.getElementById('signalList');
-            const query = document.getElementById('globalSearch')?.value?.toLowerCase() || '';
-            const filtered = masterData.signals.filter(s => s.fullName?.toLowerCase().includes(query) || s.subject?.toLowerCase().includes(query));
-            
-            document.getElementById('sigCount').innerText = filtered.length.toString().padStart(2, '0');
-            
-            list.innerHTML = filtered.map(i => {
-                const timestamp = i.timestamp?.toDate ? i.timestamp.toDate().toLocaleString() : '...';
-                const isFlagged = i.flagged ? 'border-red-600' : 'border-white/5';
-                return `
-                    <div class="p-8 bg-zinc-900/50 border ${isFlagged} group hover:border-red-600 transition-all">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="text-left">
-                                <p class="text-sm font-bold text-red-500 uppercase tracking-widest">${i.fullName}</p>
-                                <p class="text-[9px] text-zinc-500 uppercase font-mono">${i.email}</p>
-                            </div>
-                            <span class="text-[9px] text-zinc-700 font-mono">${timestamp}</span>
-                        </div>
-                        <p class="text-[9px] bg-red-600/10 px-2 py-1 inline-block text-red-500 uppercase mb-4 border border-red-600/20">${i.subject}</p>
-                        <p class="text-sm text-zinc-400 italic leading-relaxed border-l-2 border-red-600/10 pl-6 text-left">"${i.message}"</p>
-                        <div class="mt-6 flex justify-between items-center">
-                            <button onclick="window.toggleFlag('${i.id}', ${!i.flagged})" class="text-[9px] ${i.flagged ? 'text-red-500' : 'text-zinc-600'} uppercase font-bold tracking-widest">${i.flagged ? 'PRIORITY_SET' : 'MARK_PRIORITY'}</button>
-                            <button onclick="window.purge('inquiries', '${i.id}')" class="text-[9px] text-zinc-700 hover:text-red-500 uppercase tracking-widest font-black">Archive_Transmission</button>
+            const filtered = masterData.signals;
+            list.innerHTML = filtered.map(i => `
+                <div class="glass-panel p-10 border-l-4 ${i.flagged ? 'border-red-600' : 'border-white/5'} space-y-6 text-left">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-lg font-black text-red-600 uppercase tracking-tighter italic">${i.fullName}</p>
+                            <p class="text-[9px] text-zinc-600 uppercase font-mono tracking-widest">${i.email}</p>
                         </div>
                     </div>
-                `;
-            }).join('');
-            refreshIcons();
+                    <p class="text-sm text-zinc-400 italic border-l border-white/10 pl-6">"${i.message}"</p>
+                    <div class="flex justify-between items-center pt-4 border-t border-white/5">
+                        <button onclick="window.flagNode('${i.id}', ${!i.flagged})" class="text-[9px] font-black uppercase tracking-widest ${i.flagged ? 'text-red-500' : 'text-zinc-700'}">:: FLAG</button>
+                        <button onclick="window.purgeNode('inquiries', '${i.id}')" class="text-[9px] text-zinc-800 hover:text-red-600 font-black uppercase">PURGE</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // AUTH INITIALIZATION (MANDATORY RULE 3)
-        async function initAuth() {
-            const stat = document.getElementById('initStatus');
+        // ASSET MANAGEMENT
+        window.clearAsset = (prefix) => {
+            document.getElementById(`${prefix}ImageData`).value = "";
+            document.getElementById(`${prefix}Preview`).classList.add('hidden');
+            document.getElementById(`${prefix}Prompt`).classList.remove('hidden');
+            document.getElementById(`${prefix}ImageActions`).classList.add('hidden');
+        };
+
+        window.clearNodeImage = async (id) => {
+            if (!confirm("PURGE IMAGE FROM THIS BROADCAST?")) return;
             try {
-                stat.innerText = "Linking with Grid...";
-                if (initialToken) await signInWithCustomToken(auth, initialToken);
-                else await signInAnonymously(auth);
-                stat.innerText = "Uplink Secure // Awaiting Staff Keys";
-            } catch (err) {
-                console.error("Auth init failure:", err);
-                stat.innerText = "Pulse Failure // Retrying...";
-                setTimeout(initAuth, 5000);
-            }
-        }
-
-        // STAFF ACCESS
-        document.getElementById('loginForm').onsubmit = (e) => {
-            e.preventDefault();
-            const pass = document.getElementById('loginPass').value;
-            if (pass.length >= 8) { 
-                isStaffAuthorized = true;
-                toggleInterface(true);
-            } else toast("ACCESS_DENIED // INVALID_CREDENTIALS");
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', id), { imagePath: "" });
+                toast("ASSET_PURGED_FROM_BROADCAST");
+            } catch (e) { toast("PURGE_FAIL"); }
         };
 
-        document.getElementById('logoutBtn').onclick = () => {
-            isStaffAuthorized = false;
-            toggleInterface(false);
-        };
-
-        // SEARCH
-        const searchInput = document.getElementById('globalSearch');
-        if (searchInput) {
-            searchInput.oninput = () => {
-                renderEvents();
-                renderSignals();
-            };
-        }
-
-        // BINARY UPLOAD LOGIC (Optimized for Universal Hierarchical Rules)
         const uploadFile = async (file, progressEl, containerEl) => {
             return new Promise((resolve, reject) => {
-                if (!auth.currentUser) {
-                    toast("AUTH_SYNC_MISSING: RELOAD REQUIRED");
-                    reject(new Error("No active session"));
-                    return;
-                }
-
-                // RULE 3.6 PATHING: Root segment 'artifacts'
-                // We use a simplified path to ensure matching with hierarchical rules
-                const safeFileName = file.name.replace(/[^a-z0-9.]/gi, '_');
-                const filePath = `artifacts/${appId}/public/assets/${Date.now()}_${safeFileName}`;
-                
-                // Constructing reference with explicit leading artifacts path
-                const fileRef = ref(storage, filePath);
-                
-                const uploadTask = uploadBytesResumable(fileRef, file);
-
+                const path = `artifacts/${appId}/public/assets/${Date.now()}_${file.name.replace(/\s/g, '_')}`;
+                const task = uploadBytesResumable(ref(storage, path), file);
                 containerEl.classList.remove('hidden');
-                
-                uploadTask.on('state_changed', 
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        progressEl.style.width = progress + '%';
-                    }, 
-                    (error) => {
-                        console.error("Uplink Error Details:", error);
-                        containerEl.classList.add('hidden');
-                        
-                        if (error.code === 'storage/unauthorized') {
-                            toast(`PERMISSION_DENIED // PATH: ${filePath} // ACTION: Ensure Hierarchical Rules are applied in Console`);
-                            document.getElementById('storageStatus').innerText = "Storage: Blocked";
-                            document.getElementById('storageStatus').className = "text-[9px] font-mono bg-zinc-900 px-4 py-1 border border-white/5 text-red-500 uppercase";
-                        } else {
-                            toast("UPLINK_FAIL: " + error.code);
-                        }
-                        reject(error);
-                    }, 
-                    () => {
-                        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                            containerEl.classList.add('hidden');
-                            resolve(downloadURL);
-                        });
-                    }
+                task.on('state_changed', 
+                    s => progressEl.style.width = (s.bytesTransferred / s.totalBytes) * 100 + '%',
+                    e => { containerEl.classList.add('hidden'); reject(e); },
+                    () => getDownloadURL(task.snapshot.ref).then(url => { containerEl.classList.add('hidden'); resolve(url); })
                 );
             });
         };
 
-        // EVENT OPERATIONS
-        window.editEvent = (id) => {
-            const item = masterData.events.find(e => e.id === id);
-            if (!item) return;
+        // HANDLERS
+        document.getElementById('loginForm').onsubmit = (e) => {
+            e.preventDefault();
+            if (document.getElementById('loginPass').value.length >= 8) toggleInterface(true);
+            else toast("ACCESS_DENIED");
+        };
 
+        document.getElementById('logoutBtn').onclick = () => { toggleInterface(false); signOut(auth); };
+
+        document.getElementById('eventForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('evBtn'), id = document.getElementById('editEventId').value;
+            btn.disabled = true;
+            try {
+                const payload = {
+                    title: document.getElementById('evTitle').value,
+                    date: Timestamp.fromDate(new Date(document.getElementById('evDate').value)),
+                    status: document.getElementById('evStatus').value,
+                    ticketLink: document.getElementById('evTicketLink').value || null,
+                    description: document.getElementById('evDesc').value,
+                    imagePath: document.getElementById('evImageData').value || "",
+                    timestamp: serverTimestamp()
+                };
+                if (id) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', id), payload);
+                else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'events'), payload);
+                document.getElementById('evCancelBtn').click();
+                toast("BROADCAST_STABLE");
+            } catch (err) { toast("SYNC_ERROR"); }
+            btn.disabled = false;
+        };
+
+        window.editNode = (id) => {
+            const i = masterData.events.find(e => e.id === id);
+            if (!i) return;
             document.getElementById('editEventId').value = id;
-            document.getElementById('evTitle').value = item.title;
-            document.getElementById('evStatus').value = item.status;
-            document.getElementById('evDesc').value = item.description || '';
-            if (item.date) {
-                const d = item.date.toDate();
-                document.getElementById('evDate').value = d.toISOString().split('T')[0];
-            }
-            if (item.imagePath) {
-                document.getElementById('evPreview').src = item.imagePath;
+            document.getElementById('evTitle').value = i.title;
+            document.getElementById('evStatus').value = i.status;
+            document.getElementById('evTicketLink').value = i.ticketLink || '';
+            document.getElementById('evDesc').value = i.description || '';
+            if (i.date) document.getElementById('evDate').value = i.date.toDate().toISOString().split('T')[0];
+            
+            if (i.imagePath) {
+                document.getElementById('evPreview').src = i.imagePath;
                 document.getElementById('evPreview').classList.remove('hidden');
-                document.getElementById('evFileLabel').classList.add('hidden');
-                document.getElementById('evImageData').value = item.imagePath;
+                document.getElementById('evPrompt').classList.add('hidden');
+                document.getElementById('evImageActions').classList.remove('hidden');
+                document.getElementById('evImageData').value = i.imagePath;
+            } else {
+                window.clearAsset('ev');
             }
-
-            document.getElementById('evBtn').innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> Update Deployment`;
             document.getElementById('evCancelBtn').classList.remove('hidden');
-            window.scrollTo({ top: document.getElementById('eventSection').offsetTop - 100, behavior: 'smooth' });
-            refreshIcons();
+            window.scrollTo({ top: document.getElementById('eventSection').offsetTop - 120, behavior: 'smooth' });
         };
 
         document.getElementById('evCancelBtn').onclick = () => {
             document.getElementById('eventForm').reset();
             document.getElementById('editEventId').value = "";
-            document.getElementById('evPreview').classList.add('hidden');
-            document.getElementById('evFileLabel').classList.remove('hidden');
-            document.getElementById('evBtn').innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> Broadcast Signal`;
+            window.clearAsset('ev');
             document.getElementById('evCancelBtn').classList.add('hidden');
-            refreshIcons();
         };
 
-        document.getElementById('eventForm').onsubmit = async (e) => {
-            e.preventDefault();
-            if (!isStaffAuthorized) return toast("AUTH_REQUIRED");
-            
-            const id = document.getElementById('editEventId').value;
-            const btn = document.getElementById('evBtn');
-            btn.disabled = true;
-
-            const payload = {
-                title: document.getElementById('evTitle').value,
-                date: Timestamp.fromDate(new Date(document.getElementById('evDate').value)),
-                status: document.getElementById('evStatus').value,
-                description: document.getElementById('evDesc').value,
-                imagePath: document.getElementById('evImageData').value,
-                timestamp: serverTimestamp()
-            };
-
-            try {
-                if (id) {
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', id), payload);
-                    toast("NODE_UPDATED");
-                } else {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'events'), payload);
-                    toast("NODE_BROADCAST_SUCCESS");
-                }
-                document.getElementById('evCancelBtn').click();
-            } catch (err) { toast("TRANSMISSION_FAIL"); }
-            btn.disabled = false;
+        window.flagNode = async (id, s) => {
+            try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'inquiries', id), { flagged: s }); }
+            catch (e) { toast("FLAG_FAIL"); }
         };
 
-        window.toggleFlag = async (id, status) => {
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'inquiries', id), { flagged: status });
-            } catch (e) { toast("STATUS_UPDATE_FAIL"); }
+        window.purgeNode = async (c, id) => {
+            if (!confirm("PERMANENTLY TERMINATE THIS NODE FROM CORE?")) return;
+            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', c, id)); toast("NODE_PURGED"); }
+            catch (e) { toast("PURGE_REJECTED"); }
         };
 
-        window.purge = async (coll, id) => {
-            if (!confirm("PURGE NODE PERMANENTLY?")) return;
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', coll, id));
-                toast("NODE_PURGED");
-            } catch (e) { toast("PURGE_PROTOCOL_REJECTED"); }
-        };
-
-        // SETUP UPLOADS
-        const setupStorageUpload = (inputId, previewId, dataId, labelId, progressContainerId, progressBarId) => {
-            const input = document.getElementById(inputId);
-            const preview = document.getElementById(previewId);
-            const dataInput = document.getElementById(dataId);
-            const label = document.getElementById(labelId);
-            const progCont = document.getElementById(progressContainerId);
-            const progBar = document.getElementById(progressBarId);
-
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                if (file.size > 500 * 1024 * 1024) return toast("PAYLOAD_REJECTED: MAX 500MB");
-
+        const setupUploader = (inputId, prevId, dataId, promptId, actionsId, cId, bId) => {
+            document.getElementById(inputId).onchange = async (e) => {
+                const f = e.target.files[0]; if (!f) return;
                 try {
-                    label.innerText = "COMMENCING HIGH-RES UPLINK...";
-                    const downloadURL = await uploadFile(file, progBar, progCont);
-                    
-                    preview.src = downloadURL;
-                    preview.classList.remove('hidden');
-                    label.classList.add('hidden');
-                    dataInput.value = downloadURL;
-                    toast("BINARY_SIGNAL_STABLE");
-                } catch (err) {
-                    label.innerText = "UPLINK FAILED // RETRY";
-                }
+                    const url = await uploadFile(f, document.getElementById(bId), document.getElementById(cId));
+                    document.getElementById(prevId).src = url;
+                    document.getElementById(prevId).classList.remove('hidden');
+                    document.getElementById(promptId).classList.add('hidden');
+                    document.getElementById(actionsId).classList.remove('hidden');
+                    document.getElementById(dataId).value = url;
+                    toast("SIGNAL_LOCKED");
+                } catch (err) { toast("UPLINK_ABORTED"); }
             };
         };
 
-        setupStorageUpload('evFile', 'evPreview', 'evImageData', 'evFileLabel', 'evProgressContainer', 'evProgressBar');
-        setupStorageUpload('galFile', 'galPreview', 'galImageData', 'galFileLabel', 'galProgressContainer', 'galProgressBar');
+        setupUploader('evFile', 'evPreview', 'evImageData', 'evPrompt', 'evImageActions', 'evProgressContainer', 'evProgressBar');
+        setupUploader('galFile', 'galPreview', 'galImageData', 'galPrompt', 'galImageActions', 'galProgressContainer', 'galProgressBar');
 
-        // GALLERY FORM SUBMIT
         document.getElementById('galleryForm').onsubmit = async (e) => {
             e.preventDefault();
-            if (!isStaffAuthorized) return toast("AUTH_REQUIRED");
-            
             const btn = document.getElementById('galBtn');
             btn.disabled = true;
-
-            const payload = {
-                title: document.getElementById('galTitle').value,
-                logId: document.getElementById('galLog').value,
-                imageURL: document.getElementById('galImageData').value,
-                timestamp: serverTimestamp()
-            };
-
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'gallery'), payload);
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'gallery'), {
+                    title: document.getElementById('galTitle').value,
+                    logId: document.getElementById('galLog').value,
+                    imageURL: document.getElementById('galImageData').value,
+                    timestamp: serverTimestamp()
+                });
                 toast("ARCHIVE_COMMITTED");
                 e.target.reset();
-                document.getElementById('galPreview').classList.add('hidden');
-                document.getElementById('galFileLabel').classList.remove('hidden');
-            } catch (err) { toast("ARCHIVE_FAIL"); }
+                window.clearAsset('gal');
+            } catch (err) { toast("SYNC_FAIL"); }
             btn.disabled = false;
         };
 
-        // THREE.JS
         function initThree() {
             const container = document.getElementById('canvas-container');
             if (!container || container.children.length > 0) return;
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            container.appendChild(renderer.domElement);
-
-            const points = [];
-            for (let i = 0; i < 1500; i++) {
-                const x = THREE.MathUtils.randFloatSpread(20);
-                const y = THREE.MathUtils.randFloatSpread(20);
-                const z = THREE.MathUtils.randFloatSpread(20);
-                points.push(x, y, z);
-            }
-            const geometry = new THREE.BufferGeometry();
-            geometry.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
-            const material = new THREE.PointsMaterial({ color: 0xff0000, size: 0.02, transparent: true, opacity: 0.3 });
-            const cloud = new THREE.Points(geometry, material);
-            scene.add(cloud);
-            
-            camera.position.z = 5;
-
-            function animate() {
-                requestAnimationFrame(animate);
-                cloud.rotation.y += 0.0002;
-                cloud.rotation.x += 0.0001;
-                renderer.render(scene, camera);
-            }
-            animate();
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
+            const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            const ren = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            ren.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(ren.domElement);
+            const pts = []; for (let i=0; i<2500; i++) pts.push(THREE.MathUtils.randFloatSpread(50), THREE.MathUtils.randFloatSpread(50), THREE.MathUtils.randFloatSpread(50));
+            const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+            const mat = new THREE.PointsMaterial({ color: 0xff0000, size: 0.05, transparent: true, opacity: 0.3 });
+            const cloud = new THREE.Points(geo, mat); scene.add(cloud); cam.position.z = 15;
+            function anim() { requestAnimationFrame(anim); cloud.rotation.y += 0.0004; ren.render(scene, cam); }
+            anim();
         }
 
-        const handleLoad = () => {
-            refreshIcons();
-            initAuth();
+        window.onload = async () => {
+            try {
+                if (initialToken) await signInWithCustomToken(auth, initialToken);
+                else await signInAnonymously(auth);
+                document.getElementById('initStatus').innerText = "Link Stable // Staff Required";
+            } catch (err) { document.getElementById('initStatus').innerText = "Grid Link Failure"; }
+            
+            onAuthStateChanged(auth, (user) => {
+                if (!user) toggleInterface(false);
+            });
+            if (window.lucide) lucide.createIcons();
         };
 
-        if (document.readyState === 'complete') {
-            handleLoad();
-        } else {
-            window.addEventListener('load', handleLoad);
-        }
+        document.getElementById('globalSearch').oninput = () => { renderEvents(); renderSignals(); renderArchive(); };
     </script>
 </body>
 </html>
