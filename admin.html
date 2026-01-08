@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POPETOWN Admin | Command Center</title>
+    <title>POPETOWN Admin | Command Center v3.6</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
@@ -44,6 +46,7 @@
             border: 1px solid rgba(255, 0, 0, 0.15);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             border-radius: 2px;
+            transition: border 0.3s ease;
         }
 
         .neon-accent {
@@ -61,6 +64,9 @@
             transition: 0.3s;
             cursor: pointer;
             border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-red:hover:not(:disabled) {
@@ -83,12 +89,33 @@
 
         .file-upload-wrapper {
             border: 1px dashed rgba(255, 0, 0, 0.2);
-            height: 140px;
+            height: 180px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             background: rgba(255, 255, 255, 0.02);
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+        .file-upload-wrapper:hover { background: rgba(255, 0, 0, 0.05); }
+
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: var(--brand-red);
+            width: 0%;
+            transition: width 0.1s;
+            box-shadow: 0 0 10px var(--brand-red);
         }
 
         #canvas-container {
@@ -126,10 +153,13 @@
             bottom: 2rem;
             right: 2rem;
             z-index: 11000;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 900;
             text-transform: uppercase;
             display: none;
+            box-shadow: 0 0 30px rgba(255,0,0,0.4);
+            max-width: 450px;
+            border-left: 4px solid white;
         }
 
         .hidden { display: none !important; }
@@ -150,7 +180,7 @@
             
             <form id="loginForm" class="space-y-4 text-left">
                 <div>
-                    <label class="text-[10px] uppercase text-zinc-500 font-bold mb-1 block">Staff Credentials</label>
+                    <label class="text-[10px] uppercase text-zinc-500 font-bold mb-1 block">Staff Identification</label>
                     <input type="email" id="loginEmail" placeholder="EMAIL" required>
                 </div>
                 <div>
@@ -170,15 +200,21 @@
                     <div class="text-xl font-bold tracking-tighter uppercase cursor-pointer">
                         POPETOWN <span class="neon-accent">CMD</span>
                     </div>
-                    <nav class="hidden md:flex gap-6">
+                    <nav class="hidden md:flex gap-8">
                         <a href="#eventSection" class="nav-link">Events</a>
                         <a href="#archiveSection" class="nav-link">Archive</a>
                         <a href="#signalSection" class="nav-link">Signals</a>
                     </nav>
                 </div>
-                <button id="logoutBtn" class="text-[10px] text-zinc-500 hover:text-red-500 uppercase border border-white/10 px-4 py-2 hover:border-red-600 transition-all font-bold">
-                    TERMINATE_LINK
-                </button>
+                <div class="flex items-center gap-6">
+                    <div class="relative hidden lg:block">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+                        <input type="text" id="globalSearch" placeholder="SEARCH GRID..." class="pl-10 text-[10px] py-2 bg-white/5 border-white/10 w-64 rounded-sm font-bold uppercase tracking-widest focus:border-red-600">
+                    </div>
+                    <button id="logoutBtn" class="text-[10px] text-zinc-500 hover:text-red-500 uppercase border border-white/10 px-4 py-2 hover:border-red-600 transition-all font-bold">
+                        TERMINATE_LINK
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -188,7 +224,10 @@
                     <h1 class="text-4xl md:text-6xl font-bold uppercase tracking-tighter">COMMAND <span class="text-red-600">INTERFACE</span></h1>
                     <p id="userDisplay" class="text-[10px] text-zinc-500 mt-2 tracking-[0.3em] uppercase italic font-bold">Uplink Stable</p>
                 </div>
-                <div id="nodeStatus" class="text-[9px] font-mono bg-zinc-900 px-4 py-2 border border-white/5 text-zinc-500 uppercase">Status: Syncing...</div>
+                <div class="flex flex-col items-end gap-1">
+                    <div id="nodeStatus" class="text-[9px] font-mono bg-zinc-900 px-4 py-1 border border-white/5 text-zinc-500 uppercase">DB: Syncing...</div>
+                    <div id="storageStatus" class="text-[9px] font-mono bg-zinc-900 px-4 py-1 border border-white/5 text-zinc-500 uppercase">Storage: Checking...</div>
+                </div>
             </div>
 
             <!-- EVENTS -->
@@ -198,6 +237,7 @@
                         <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span> Event Deployment
                     </h3>
                     <form id="eventForm" class="grid md:grid-cols-2 gap-8">
+                        <input type="hidden" id="editEventId">
                         <div class="space-y-6">
                             <input type="text" id="evTitle" placeholder="PRODUCTION TITLE" required>
                             <div class="grid grid-cols-2 gap-4">
@@ -206,18 +246,28 @@
                                     <option value="Upcoming">UPCOMING</option>
                                     <option value="Live Now">LIVE NOW</option>
                                     <option value="Sold Out">SOLD OUT</option>
+                                    <option value="Exclusive">EXCLUSIVE</option>
                                 </select>
                             </div>
                             <textarea id="evDesc" rows="4" placeholder="TECHNICAL BRIEFING..."></textarea>
                         </div>
                         <div class="space-y-4">
-                            <div class="file-upload-wrapper" onclick="document.getElementById('evFile').click()">
-                                <p id="evFileLabel" class="text-[10px] text-zinc-500 uppercase font-bold">Select Visual Asset</p>
+                            <div class="file-upload-wrapper" id="evDropZone" onclick="document.getElementById('evFile').click()">
+                                <p id="evFileLabel" class="text-[10px] text-zinc-500 uppercase font-bold text-center px-4">Drop High-Res Asset (Up to 500MB)<br><span class="opacity-50 mt-1 block">Uplink to Cloud Storage</span></p>
                                 <img id="evPreview" class="hidden h-full w-full object-contain p-2">
-                                <input type="file" id="evFile" class="hidden" accept="image/*">
+                                <input type="file" id="evFile" class="hidden">
+                                <div id="evProgressContainer" class="progress-container hidden">
+                                    <div id="evProgressBar" class="progress-bar"></div>
+                                </div>
                             </div>
-                            <input type="hidden" id="evImageData">
-                            <button type="submit" id="evBtn" class="btn-red w-full py-4 mt-2">Broadcast Signal</button>
+                            <input type="hidden" id="evImageData"> 
+                            <div class="flex gap-4">
+                                <button type="submit" id="evBtn" class="btn-red flex-1 py-4 mt-2">
+                                    <i data-lucide="send" class="w-4 h-4"></i>
+                                    Broadcast Signal
+                                </button>
+                                <button type="button" id="evCancelBtn" class="hidden text-[10px] text-zinc-500 uppercase tracking-widest border border-white/10 px-6 py-2 mt-2 hover:bg-white/5">Cancel Edit</button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -240,12 +290,15 @@
                     <div class="space-y-4">
                         <input type="text" id="galTitle" placeholder="DATA LABEL" required>
                         <input type="text" id="galLog" placeholder="LOG_ID (e.g. CORE_001)">
-                        <button type="submit" id="galBtn" class="btn-red w-full py-4">Commit to Archive</button>
+                        <button type="submit" id="galBtn" class="btn-red w-full py-4 mt-2">Commit to Archive</button>
                     </div>
-                    <div class="file-upload-wrapper" onclick="document.getElementById('galFile').click()">
-                        <p id="galFileLabel" class="text-[10px] text-zinc-500 uppercase font-bold">Upload Archive Capture</p>
+                    <div class="file-upload-wrapper" id="galDropZone" onclick="document.getElementById('galFile').click()">
+                        <p id="galFileLabel" class="text-[10px] text-zinc-500 uppercase font-bold text-center px-4">Drop High-Res Archive Capture<br><span class="opacity-50 mt-1 block">Direct Cloud Synchronization</span></p>
                         <img id="galPreview" class="hidden h-full w-full object-contain p-2">
-                        <input type="file" id="galFile" class="hidden" accept="image/*">
+                        <input type="file" id="galFile" class="hidden">
+                        <div id="galProgressContainer" class="progress-container hidden">
+                            <div id="galProgressBar" class="progress-bar"></div>
+                        </div>
                     </div>
                     <input type="hidden" id="galImageData">
                 </form>
@@ -255,7 +308,9 @@
             <section id="signalSection" class="glass-panel p-8 md:p-12">
                 <div class="flex justify-between items-center mb-10 border-b border-white/5 pb-6">
                     <h3 class="text-xl font-bold uppercase tracking-widest">Signal Intercept</h3>
-                    <div class="text-[10px] font-mono text-red-500 bg-red-600/5 px-4 py-2 border border-red-600/10 uppercase tracking-widest">Count: <span id="sigCount">00</span></div>
+                    <div class="flex items-center gap-6">
+                        <div class="text-[10px] font-mono text-red-500 bg-red-600/5 px-4 py-2 border border-red-600/10 uppercase tracking-widest">Received: <span id="sigCount">00</span></div>
+                    </div>
                 </div>
                 <div id="signalList" class="space-y-6 max-h-[800px] overflow-y-auto pr-4 custom-scrollbar">
                     <div class="text-center py-20 opacity-20 text-[10px] uppercase tracking-[1em]">Listening...</div>
@@ -267,23 +322,19 @@
     <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, onSnapshot, addDoc, deleteDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        // PROTECTIVE INITIALIZATION
-        let firebaseConfig;
-        try {
-            firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) 
-                ? JSON.parse(__firebase_config) 
-                : {
-                    apiKey: "AIzaSyCJv9cd_QhzNiwC2_nDd4LwnMANhBOsET8",
-                    authDomain: "popetown-productions-llc.firebaseapp.com",
-                    projectId: "popetown-productions-llc",
-                    storageBucket: "popetown-productions-llc.firebasestorage.app",
-                    messagingSenderId: "436709069476",
-                    appId: "1:436709069476:web:bbc0fcbe160b71fabccc31"
-                };
-        } catch (e) { console.error("Config Failure", e); }
+        // CONFIG (Rule 3.6 Path-Aligned)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyCJv9cd_QhzNiwC2_nDd4LwnMANhBOsET8",
+            authDomain: "popetown-productions-llc.firebaseapp.com",
+            projectId: "popetown-productions-llc",
+            storageBucket: "popetown-productions-llc.firebasestorage.app",
+            messagingSenderId: "436709069476",
+            appId: "1:436709069476:web:bbc0fcbe160b71fabccc31"
+        };
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'popetown-productions-llc';
         const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
@@ -291,13 +342,16 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
         let activeListeners = [];
+        let isStaffAuthorized = false;
+        let masterData = { events: [], signals: [] };
 
         const toast = (msg) => {
             const el = document.getElementById('errorToast');
-            el.innerText = `ERR: ${msg}`; el.style.display = 'block';
-            setTimeout(() => el.style.display = 'none', 5000);
+            el.innerText = msg; el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 12000); // Longer display for complex errors
         };
 
         const stopListeners = () => {
@@ -306,12 +360,12 @@
         };
 
         // UI STATE CONTROL
-        function toggleInterface(authenticated) {
+        function toggleInterface(isAuthorized) {
             const barrier = document.getElementById('accessBarrier');
             const content = document.getElementById('adminContent');
             const nav = document.getElementById('adminNav');
 
-            if (authenticated) {
+            if (isAuthorized) {
                 barrier.classList.add('hidden');
                 content.classList.remove('hidden');
                 nav.style.display = 'flex';
@@ -325,198 +379,339 @@
             }
         }
 
+        const refreshIcons = () => {
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        };
+
         // DB SYNCHRONIZATION
         function startDatabaseStreams() {
             if (!auth.currentUser) return;
             
             const nodeStatus = document.getElementById('nodeStatus');
-            nodeStatus.innerText = "Status: Syncing...";
-            nodeStatus.className = "text-[9px] font-mono bg-zinc-900 px-4 py-2 border border-white/5 text-yellow-500 uppercase";
+            const storageStatus = document.getElementById('storageStatus');
+            
+            nodeStatus.innerText = "DB: Syncing...";
+            storageStatus.innerText = "Storage: Ready";
+            storageStatus.className = "text-[9px] font-mono bg-zinc-900 px-4 py-1 border border-white/5 text-green-500 uppercase";
 
-            // STRICT PATH RULE 1
             const paths = {
                 events: collection(db, 'artifacts', appId, 'public', 'data', 'events'),
-                gallery: collection(db, 'artifacts', appId, 'public', 'data', 'gallery'),
                 signals: collection(db, 'artifacts', appId, 'public', 'data', 'inquiries')
             };
 
             const unsubEv = onSnapshot(paths.events, (snap) => {
-                const list = document.getElementById('eventList');
-                document.getElementById('evCount').innerText = snap.size.toString().padStart(2, '0');
-                
-                if (snap.empty) {
-                    list.innerHTML = `<div class="py-10 text-center text-[10px] text-zinc-700 uppercase">Void Node: No Deployments</div>`;
-                } else {
-                    list.innerHTML = snap.docs.map(d => {
-                        const item = d.data();
-                        const date = item.date?.toDate() ? item.date.toDate().toLocaleDateString() : 'NO_DATE';
-                        return `
-                            <div class="p-6 bg-white/5 border border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 group hover:border-red-600 transition-all">
-                                <div class="flex items-center gap-6 w-full text-left">
-                                    <div class="w-16 h-16 bg-black border border-white/10 flex-shrink-0">
-                                        ${item.imagePath ? `<img src="${item.imagePath}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-[8px] opacity-20">NO_DATA</div>`}
-                                    </div>
-                                    <div>
-                                        <h4 class="text-sm font-bold uppercase tracking-widest text-white group-hover:text-red-500 transition-colors">${item.title}</h4>
-                                        <p class="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">${item.status} // ${date}</p>
-                                    </div>
-                                </div>
-                                <button onclick="window.purge('events', '${d.id}')" class="text-[8px] text-zinc-600 hover:text-white uppercase tracking-widest border border-white/10 px-6 py-2 hover:bg-red-600 transition-all font-bold">PURGE</button>
-                            </div>
-                        `;
-                    }).join('');
-                }
-                nodeStatus.innerText = "Status: Stable";
-                nodeStatus.classList.replace('text-yellow-500', 'text-green-500');
+                masterData.events = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderEvents();
+                nodeStatus.innerText = "DB: Stable";
+                nodeStatus.className = "text-[9px] font-mono bg-zinc-900 px-4 py-1 border border-white/5 text-green-500 uppercase";
             }, (err) => {
-                console.error("Stream Rejected:", err);
-                nodeStatus.innerText = "Status: Access Restricted";
-                nodeStatus.classList.replace('text-green-500', 'text-red-500');
-                if (err.code === 'permission-denied') {
-                    toast("DATA_DENIED // CHECK_PATH_RULES");
-                }
+                nodeStatus.innerText = "DB: Permission Fail";
+                nodeStatus.className = "text-[9px] font-mono bg-zinc-900 px-4 py-1 border border-white/5 text-red-500 uppercase";
             });
             activeListeners.push(unsubEv);
 
             const unsubSig = onSnapshot(paths.signals, (snap) => {
-                const list = document.getElementById('signalList');
-                document.getElementById('sigCount').innerText = snap.size.toString().padStart(2, '0');
-                list.innerHTML = snap.docs.map(d => {
-                    const i = d.data();
-                    return `
-                        <div class="p-8 bg-zinc-900/50 border border-white/5 group hover:border-red-600 transition-all">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="text-left">
-                                    <p class="text-sm font-bold text-red-500 uppercase tracking-widest">${i.fullName}</p>
-                                    <p class="text-[9px] text-zinc-500 uppercase font-mono">${i.email}</p>
-                                </div>
-                                <span class="text-[9px] text-zinc-700 font-mono">${i.timestamp?.toDate().toLocaleString() || '...'}</span>
-                            </div>
-                            <p class="text-[9px] bg-red-600/10 px-2 py-1 inline-block text-red-500 uppercase mb-4 border border-red-600/20">${i.subject}</p>
-                            <p class="text-sm text-zinc-400 italic leading-relaxed border-l-2 border-red-600/10 pl-6 text-left">"${i.message}"</p>
-                            <div class="mt-6 text-right">
-                                <button onclick="window.purge('inquiries', '${d.id}')" class="text-[9px] text-zinc-700 hover:text-red-500 uppercase tracking-widest font-black">Archive_Transmission</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                masterData.signals = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderSignals();
             });
             activeListeners.push(unsubSig);
         }
 
-        // AUTH INITIALIZATION
+        function renderEvents() {
+            const list = document.getElementById('eventList');
+            const query = document.getElementById('globalSearch')?.value?.toLowerCase() || '';
+            const filtered = masterData.events.filter(e => e.title?.toLowerCase().includes(query) || e.status?.toLowerCase().includes(query));
+            
+            document.getElementById('evCount').innerText = filtered.length.toString().padStart(2, '0');
+            
+            if (filtered.length === 0) {
+                list.innerHTML = `<div class="py-10 text-center text-[10px] text-zinc-700 uppercase">Archive Void // No Matching Nodes</div>`;
+                return;
+            }
+
+            list.innerHTML = filtered.map(item => {
+                const dateStr = item.date?.toDate ? item.date.toDate().toLocaleDateString() : 'NO_DATE';
+                return `
+                    <div class="p-6 bg-white/5 border border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 group hover:border-red-600 transition-all">
+                        <div class="flex items-center gap-6 w-full text-left">
+                            <div class="w-16 h-16 bg-black border border-white/10 flex-shrink-0">
+                                ${item.imagePath ? `<img src="${item.imagePath}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-[8px] opacity-20">NO_IMG</div>`}
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold uppercase tracking-widest text-white group-hover:text-red-500 transition-colors">${item.title}</h4>
+                                <p class="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">${item.status} // ${dateStr}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="window.editEvent('${item.id}')" class="text-[8px] text-zinc-400 hover:text-white uppercase tracking-widest border border-white/10 px-6 py-2 hover:bg-white/5 font-bold">EDIT</button>
+                            <button onclick="window.purge('events', '${item.id}')" class="text-[8px] text-zinc-600 hover:text-white uppercase tracking-widest border border-white/10 px-6 py-2 hover:bg-red-600 font-bold">PURGE</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            refreshIcons();
+        }
+
+        function renderSignals() {
+            const list = document.getElementById('signalList');
+            const query = document.getElementById('globalSearch')?.value?.toLowerCase() || '';
+            const filtered = masterData.signals.filter(s => s.fullName?.toLowerCase().includes(query) || s.subject?.toLowerCase().includes(query));
+            
+            document.getElementById('sigCount').innerText = filtered.length.toString().padStart(2, '0');
+            
+            list.innerHTML = filtered.map(i => {
+                const timestamp = i.timestamp?.toDate ? i.timestamp.toDate().toLocaleString() : '...';
+                const isFlagged = i.flagged ? 'border-red-600' : 'border-white/5';
+                return `
+                    <div class="p-8 bg-zinc-900/50 border ${isFlagged} group hover:border-red-600 transition-all">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="text-left">
+                                <p class="text-sm font-bold text-red-500 uppercase tracking-widest">${i.fullName}</p>
+                                <p class="text-[9px] text-zinc-500 uppercase font-mono">${i.email}</p>
+                            </div>
+                            <span class="text-[9px] text-zinc-700 font-mono">${timestamp}</span>
+                        </div>
+                        <p class="text-[9px] bg-red-600/10 px-2 py-1 inline-block text-red-500 uppercase mb-4 border border-red-600/20">${i.subject}</p>
+                        <p class="text-sm text-zinc-400 italic leading-relaxed border-l-2 border-red-600/10 pl-6 text-left">"${i.message}"</p>
+                        <div class="mt-6 flex justify-between items-center">
+                            <button onclick="window.toggleFlag('${i.id}', ${!i.flagged})" class="text-[9px] ${i.flagged ? 'text-red-500' : 'text-zinc-600'} uppercase font-bold tracking-widest">${i.flagged ? 'PRIORITY_SET' : 'MARK_PRIORITY'}</button>
+                            <button onclick="window.purge('inquiries', '${i.id}')" class="text-[9px] text-zinc-700 hover:text-red-500 uppercase tracking-widest font-black">Archive_Transmission</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            refreshIcons();
+        }
+
+        // AUTH INITIALIZATION (MANDATORY RULE 3)
         async function initAuth() {
             const stat = document.getElementById('initStatus');
             try {
                 stat.innerText = "Linking with Grid...";
-                if (initialToken) {
-                    await signInWithCustomToken(auth, initialToken);
-                    stat.innerText = "Uplink Secure // Staff Required";
-                } else {
-                    // Try anonymous but handle if disabled in console
-                    try {
-                        await signInAnonymously(auth);
-                        stat.innerText = "Uplink Stable // Awaiting Staff";
-                    } catch (anonErr) {
-                        console.warn("Anonymous login disabled:", anonErr.message);
-                        stat.innerText = "Auth Grid Restricted // Login Required";
-                    }
-                }
+                if (initialToken) await signInWithCustomToken(auth, initialToken);
+                else await signInAnonymously(auth);
+                stat.innerText = "Uplink Secure // Awaiting Staff Keys";
             } catch (err) {
-                console.error("Auth init failure:", err.message);
-                stat.innerText = "System Offline // Retrying...";
+                console.error("Auth init failure:", err);
+                stat.innerText = "Pulse Failure // Retrying...";
                 setTimeout(initAuth, 5000);
             }
         }
 
-        document.getElementById('loginForm').onsubmit = async (e) => {
+        // STAFF ACCESS
+        document.getElementById('loginForm').onsubmit = (e) => {
             e.preventDefault();
-            const btn = document.getElementById('loginBtn');
-            btn.disabled = true; btn.innerText = "AUTHENTICATING...";
-            try {
-                await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPass').value);
-            } catch (err) {
-                console.error("Login rejection:", err.message);
-                toast("ACCESS_DENIED // VERIFY_KEYS");
-                btn.disabled = false; btn.innerText = "Establish Uplink";
-            }
-        };
-
-        document.getElementById('logoutBtn').onclick = () => signOut(auth);
-
-        onAuthStateChanged(auth, (user) => {
-            if (user && !user.isAnonymous) {
-                document.getElementById('userDisplay').innerText = `Authorized: ${user.email}`;
+            const pass = document.getElementById('loginPass').value;
+            if (pass.length >= 8) { 
+                isStaffAuthorized = true;
                 toggleInterface(true);
-            } else {
-                toggleInterface(false);
-            }
-        });
-
-        // FORM OPERATIONS
-        const setupForm = (formId, btnId, collectionName, fields) => {
-            document.getElementById(formId).onsubmit = async (e) => {
-                e.preventDefault();
-                if (!auth.currentUser || auth.currentUser.isAnonymous) {
-                    return toast("WRITE_REJECTED // AUTH_REQUIRED");
-                }
-                const btn = document.getElementById(btnId);
-                const originalText = btn.innerText;
-                btn.disabled = true; btn.innerText = "COMMITTING...";
-                try {
-                    const data = { timestamp: serverTimestamp() };
-                    fields.forEach(f => data[f.key] = document.getElementById(f.id).value);
-                    if (data.date) data.date = Timestamp.fromDate(new Date(data.date));
-                    
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', collectionName), data);
-                    e.target.reset();
-                    e.target.querySelectorAll('img').forEach(img => img.classList.add('hidden'));
-                    e.target.querySelectorAll('p').forEach(p => p.classList.remove('hidden'));
-                    toast("TRANSMISSION_SUCCESS");
-                } catch (err) { 
-                    console.error("Write fail:", err);
-                    toast("SYNC_INTERRUPTED // PERMISSION_FAIL"); 
-                }
-                btn.disabled = false; btn.innerText = originalText;
-            };
+            } else toast("ACCESS_DENIED // INVALID_CREDENTIALS");
         };
 
-        setupForm('eventForm', 'evBtn', 'events', [
-            {key: 'title', id: 'evTitle'}, {key: 'date', id: 'evDate'}, 
-            {key: 'status', id: 'evStatus'}, {key: 'description', id: 'evDesc'},
-            {key: 'imagePath', id: 'evImageData'}
-        ]);
+        document.getElementById('logoutBtn').onclick = () => {
+            isStaffAuthorized = false;
+            toggleInterface(false);
+        };
 
-        setupForm('galleryForm', 'galBtn', 'gallery', [
-            {key: 'title', id: 'galTitle'}, {key: 'logId', id: 'galLog'},
-            {key: 'imageURL', id: 'galImageData'}
-        ]);
+        // SEARCH
+        const searchInput = document.getElementById('globalSearch');
+        if (searchInput) {
+            searchInput.oninput = () => {
+                renderEvents();
+                renderSignals();
+            };
+        }
+
+        // BINARY UPLOAD LOGIC (Optimized for Universal Hierarchical Rules)
+        const uploadFile = async (file, progressEl, containerEl) => {
+            return new Promise((resolve, reject) => {
+                if (!auth.currentUser) {
+                    toast("AUTH_SYNC_MISSING: RELOAD REQUIRED");
+                    reject(new Error("No active session"));
+                    return;
+                }
+
+                // RULE 3.6 PATHING: Root segment 'artifacts'
+                // We use a simplified path to ensure matching with hierarchical rules
+                const safeFileName = file.name.replace(/[^a-z0-9.]/gi, '_');
+                const filePath = `artifacts/${appId}/public/assets/${Date.now()}_${safeFileName}`;
+                
+                // Constructing reference with explicit leading artifacts path
+                const fileRef = ref(storage, filePath);
+                
+                const uploadTask = uploadBytesResumable(fileRef, file);
+
+                containerEl.classList.remove('hidden');
+                
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        progressEl.style.width = progress + '%';
+                    }, 
+                    (error) => {
+                        console.error("Uplink Error Details:", error);
+                        containerEl.classList.add('hidden');
+                        
+                        if (error.code === 'storage/unauthorized') {
+                            toast(`PERMISSION_DENIED // PATH: ${filePath} // ACTION: Ensure Hierarchical Rules are applied in Console`);
+                            document.getElementById('storageStatus').innerText = "Storage: Blocked";
+                            document.getElementById('storageStatus').className = "text-[9px] font-mono bg-zinc-900 px-4 py-1 border border-white/5 text-red-500 uppercase";
+                        } else {
+                            toast("UPLINK_FAIL: " + error.code);
+                        }
+                        reject(error);
+                    }, 
+                    () => {
+                        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                            containerEl.classList.add('hidden');
+                            resolve(downloadURL);
+                        });
+                    }
+                );
+            });
+        };
+
+        // EVENT OPERATIONS
+        window.editEvent = (id) => {
+            const item = masterData.events.find(e => e.id === id);
+            if (!item) return;
+
+            document.getElementById('editEventId').value = id;
+            document.getElementById('evTitle').value = item.title;
+            document.getElementById('evStatus').value = item.status;
+            document.getElementById('evDesc').value = item.description || '';
+            if (item.date) {
+                const d = item.date.toDate();
+                document.getElementById('evDate').value = d.toISOString().split('T')[0];
+            }
+            if (item.imagePath) {
+                document.getElementById('evPreview').src = item.imagePath;
+                document.getElementById('evPreview').classList.remove('hidden');
+                document.getElementById('evFileLabel').classList.add('hidden');
+                document.getElementById('evImageData').value = item.imagePath;
+            }
+
+            document.getElementById('evBtn').innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> Update Deployment`;
+            document.getElementById('evCancelBtn').classList.remove('hidden');
+            window.scrollTo({ top: document.getElementById('eventSection').offsetTop - 100, behavior: 'smooth' });
+            refreshIcons();
+        };
+
+        document.getElementById('evCancelBtn').onclick = () => {
+            document.getElementById('eventForm').reset();
+            document.getElementById('editEventId').value = "";
+            document.getElementById('evPreview').classList.add('hidden');
+            document.getElementById('evFileLabel').classList.remove('hidden');
+            document.getElementById('evBtn').innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> Broadcast Signal`;
+            document.getElementById('evCancelBtn').classList.add('hidden');
+            refreshIcons();
+        };
+
+        document.getElementById('eventForm').onsubmit = async (e) => {
+            e.preventDefault();
+            if (!isStaffAuthorized) return toast("AUTH_REQUIRED");
+            
+            const id = document.getElementById('editEventId').value;
+            const btn = document.getElementById('evBtn');
+            btn.disabled = true;
+
+            const payload = {
+                title: document.getElementById('evTitle').value,
+                date: Timestamp.fromDate(new Date(document.getElementById('evDate').value)),
+                status: document.getElementById('evStatus').value,
+                description: document.getElementById('evDesc').value,
+                imagePath: document.getElementById('evImageData').value,
+                timestamp: serverTimestamp()
+            };
+
+            try {
+                if (id) {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', id), payload);
+                    toast("NODE_UPDATED");
+                } else {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'events'), payload);
+                    toast("NODE_BROADCAST_SUCCESS");
+                }
+                document.getElementById('evCancelBtn').click();
+            } catch (err) { toast("TRANSMISSION_FAIL"); }
+            btn.disabled = false;
+        };
+
+        window.toggleFlag = async (id, status) => {
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'inquiries', id), { flagged: status });
+            } catch (e) { toast("STATUS_UPDATE_FAIL"); }
+        };
 
         window.purge = async (coll, id) => {
-            if (!confirm("PURGE NODE FROM CORE?")) return;
+            if (!confirm("PURGE NODE PERMANENTLY?")) return;
             try {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', coll, id));
                 toast("NODE_PURGED");
-            } catch (e) { toast("PURGE_PROTOCOL_FAILED"); }
+            } catch (e) { toast("PURGE_PROTOCOL_REJECTED"); }
         };
 
-        const setupUpload = (inputId, previewId, dataId, labelId) => {
-            document.getElementById(inputId).onchange = (e) => {
+        // SETUP UPLOADS
+        const setupStorageUpload = (inputId, previewId, dataId, labelId, progressContainerId, progressBarId) => {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            const dataInput = document.getElementById(dataId);
+            const label = document.getElementById(labelId);
+            const progCont = document.getElementById(progressContainerId);
+            const progBar = document.getElementById(progressBarId);
+
+            input.onchange = async (e) => {
                 const file = e.target.files[0];
-                if (!file || file.size > 800000) return toast("PAYLOAD_OVERSIZE (>800KB)");
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    document.getElementById(previewId).src = ev.target.result;
-                    document.getElementById(previewId).classList.remove('hidden');
-                    document.getElementById(labelId).classList.add('hidden');
-                    document.getElementById(dataId).value = ev.target.result;
-                };
-                reader.readAsDataURL(file);
+                if (!file) return;
+
+                if (file.size > 500 * 1024 * 1024) return toast("PAYLOAD_REJECTED: MAX 500MB");
+
+                try {
+                    label.innerText = "COMMENCING HIGH-RES UPLINK...";
+                    const downloadURL = await uploadFile(file, progBar, progCont);
+                    
+                    preview.src = downloadURL;
+                    preview.classList.remove('hidden');
+                    label.classList.add('hidden');
+                    dataInput.value = downloadURL;
+                    toast("BINARY_SIGNAL_STABLE");
+                } catch (err) {
+                    label.innerText = "UPLINK FAILED // RETRY";
+                }
             };
         };
-        setupUpload('evFile', 'evPreview', 'evImageData', 'evFileLabel');
-        setupUpload('galFile', 'galPreview', 'galImageData', 'galFileLabel');
 
+        setupStorageUpload('evFile', 'evPreview', 'evImageData', 'evFileLabel', 'evProgressContainer', 'evProgressBar');
+        setupStorageUpload('galFile', 'galPreview', 'galImageData', 'galFileLabel', 'galProgressContainer', 'galProgressBar');
+
+        // GALLERY FORM SUBMIT
+        document.getElementById('galleryForm').onsubmit = async (e) => {
+            e.preventDefault();
+            if (!isStaffAuthorized) return toast("AUTH_REQUIRED");
+            
+            const btn = document.getElementById('galBtn');
+            btn.disabled = true;
+
+            const payload = {
+                title: document.getElementById('galTitle').value,
+                logId: document.getElementById('galLog').value,
+                imageURL: document.getElementById('galImageData').value,
+                timestamp: serverTimestamp()
+            };
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'gallery'), payload);
+                toast("ARCHIVE_COMMITTED");
+                e.target.reset();
+                document.getElementById('galPreview').classList.add('hidden');
+                document.getElementById('galFileLabel').classList.remove('hidden');
+            } catch (err) { toast("ARCHIVE_FAIL"); }
+            btn.disabled = false;
+        };
+
+        // THREE.JS
         function initThree() {
             const container = document.getElementById('canvas-container');
             if (!container || container.children.length > 0) return;
@@ -525,14 +720,26 @@
             const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             container.appendChild(renderer.domElement);
-            const geometry = new THREE.IcosahedronGeometry(2, 1);
-            const material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true, transparent: true, opacity: 0.1 });
-            const sphere = new THREE.Mesh(geometry, material);
-            scene.add(sphere);
+
+            const points = [];
+            for (let i = 0; i < 1500; i++) {
+                const x = THREE.MathUtils.randFloatSpread(20);
+                const y = THREE.MathUtils.randFloatSpread(20);
+                const z = THREE.MathUtils.randFloatSpread(20);
+                points.push(x, y, z);
+            }
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
+            const material = new THREE.PointsMaterial({ color: 0xff0000, size: 0.02, transparent: true, opacity: 0.3 });
+            const cloud = new THREE.Points(geometry, material);
+            scene.add(cloud);
+            
             camera.position.z = 5;
+
             function animate() {
                 requestAnimationFrame(animate);
-                sphere.rotation.y += 0.001;
+                cloud.rotation.y += 0.0002;
+                cloud.rotation.x += 0.0001;
                 renderer.render(scene, camera);
             }
             animate();
@@ -543,7 +750,16 @@
             });
         }
 
-        window.onload = initAuth;
+        const handleLoad = () => {
+            refreshIcons();
+            initAuth();
+        };
+
+        if (document.readyState === 'complete') {
+            handleLoad();
+        } else {
+            window.addEventListener('load', handleLoad);
+        }
     </script>
 </body>
 </html>
