@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POPETOWN Admin | Command Center v4.0</title>
+    <title>POPETOWN Admin | Command Center v4.1</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Three.js -->
@@ -172,7 +172,7 @@
     <!-- SECURITY BARRIER -->
     <div id="accessBarrier">
         <div class="glass-panel p-16 max-w-lg w-full text-center border-t-[6px] border-red-600">
-            <h2 class="text-4xl font-black mb-2 uppercase tracking-tighter italic">POPETOWN <span class="text-red-600">ADMIN</span></h2>
+            <h2 class="text-4xl font-black mb-2 uppercase tracking-tighter italic text-white">POPETOWN <span class="text-red-600">ADMIN</span></h2>
             <p class="text-[10px] text-zinc-500 uppercase tracking-[0.5em] mb-12">Authorized Personnel Access Only</p>
             
             <form id="loginForm" class="space-y-6 text-left">
@@ -202,12 +202,13 @@
                     </div>
                     <nav class="hidden lg:flex gap-4">
                         <a href="#eventSection" class="nav-link">Production</a>
+                        <a href="#gallerySection" class="nav-link">Media_Core</a>
                         <a href="#archiveSection" class="nav-link">Archive</a>
                         <a href="#signalSection" class="nav-link">Signals</a>
                     </nav>
                 </div>
                 <div class="flex items-center gap-8">
-                    <div class="relative hidden xl:block">
+                    <div class="relative hidden xl:block text-left">
                         <i data-lucide="search" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600"></i>
                         <input type="text" id="globalSearch" placeholder="SEARCH CORE DATABASE..." class="pl-12 text-[10px] py-3 bg-white/5 border-white/5 w-80 rounded-sm font-bold uppercase tracking-widest focus:border-red-600">
                     </div>
@@ -246,7 +247,7 @@
                 <div class="flex justify-between items-end border-b border-white/5 pb-8">
                     <div class="text-left">
                         <h2 class="text-2xl font-black uppercase tracking-widest text-white">Production <span class="text-red-600">Grid</span></h2>
-                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2 italic">Deploy and manage live event nodes and ticketing links</p>
+                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2 italic text-left">Deploy and manage live event nodes and ticketing links</p>
                     </div>
                     <div id="nodeStatus" class="text-[9px] font-mono bg-zinc-900 px-6 py-2 border border-white/5 text-zinc-500 uppercase tracking-widest">Network: Syncing...</div>
                 </div>
@@ -273,11 +274,11 @@
 
                             <input type="url" id="evTicketLink" placeholder="ADD TICKET PORTAL LINK (OPTIONAL)" class="font-mono text-xs text-white">
 
-                            <textarea id="evDesc" rows="4" placeholder="TECHNICAL BRIEFING DATA..." class="custom-scrollbar text-white"></textarea>
+                            <textarea id="evDesc" rows="4" placeholder="TECHNICAL BRIEFING DATA..." class="custom-scrollbar text-white text-left"></textarea>
                             
                             <div class="file-upload-wrapper group" id="evDropZone">
                                 <div id="evImageActions" class="asset-actions hidden">
-                                    <button type="button" onclick="window.clearAsset('ev')" class="asset-btn" title="Delete Asset">
+                                    <button type="button" onclick="window.clearAsset('ev')" class="asset-btn" title="Purge Asset">
                                         <i data-lucide="trash-2" class="w-4 h-4 text-white"></i>
                                     </button>
                                 </div>
@@ -313,19 +314,77 @@
                 </div>
             </section>
 
-            <!-- ARCHIVE MANAGEMENT -->
-            <section id="archiveSection" class="space-y-12">
-                <div class="flex justify-between items-end border-b border-white/5 pb-8">
-                    <div class="text-left">
-                        <h2 class="text-2xl font-black uppercase tracking-widest text-white">Archive <span class="text-red-600">Core</span></h2>
-                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2 italic">Permanent capture synchronization and media asset management</p>
+            <!-- MEDIA GALLERY (NEW) -->
+            <section id="gallerySection" class="space-y-12">
+                <div class="flex justify-between items-end border-b border-white/5 pb-8 text-left">
+                    <div>
+                        <h2 class="text-2xl font-black uppercase tracking-widest text-white">Media <span class="text-red-600">Core</span></h2>
+                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2 italic">Broadcast Video & Images directly to the Gallery subpage</p>
                     </div>
                 </div>
                 
                 <div class="grid lg:grid-cols-3 gap-12">
-                    <!-- Form -->
+                    <!-- Media Form -->
                     <div class="lg:col-span-1 glass-panel p-10 space-y-8">
-                        <h3 class="text-sm font-black uppercase tracking-[0.3em]">New Capture</h3>
+                        <h3 class="text-sm font-black uppercase tracking-[0.3em]">Direct Media Broadcast</h3>
+                        <form id="mediaGalleryForm" class="space-y-6">
+                            <input type="text" id="mgTitle" placeholder="ASSET TITLE" required class="text-white">
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <select id="mgType" class="text-white">
+                                    <option value="image">Still_Capture</option>
+                                    <option value="video">Motion_Visual</option>
+                                </select>
+                                <input type="text" id="mgCategory" placeholder="CATEGORY (e.g. Cinema)" class="text-white text-xs">
+                            </div>
+
+                            <div class="file-upload-wrapper group" id="mgDropZone">
+                                <div id="mgImageActions" class="asset-actions hidden">
+                                    <button type="button" onclick="window.clearAsset('mg')" class="asset-btn">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                                <div id="mgPrompt" class="flex flex-col items-center justify-center p-8 text-center cursor-pointer" onclick="document.getElementById('mgFile').click()">
+                                    <p class="text-[9px] text-zinc-500 uppercase font-black leading-relaxed">
+                                        Select Image or Video<br>
+                                        <span class="text-red-600 opacity-60">(Unlimited Capacity Uplink)</span>
+                                    </p>
+                                </div>
+                                <img id="mgPreview" class="hidden h-full w-full object-cover">
+                                <video id="mgVideoPreview" class="hidden h-full w-full object-cover" muted loop playsinline></video>
+                                
+                                <div id="mgProgressContainer" class="progress-container hidden">
+                                    <div id="mgProgressBar" class="progress-bar"></div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="mgImageData">
+                            
+                            <button type="submit" id="mgBtn" class="btn-red w-full py-5">
+                                <i data-lucide="cast" class="w-4 h-4"></i> Broadcast to Gallery
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Media Grid Management -->
+                    <div class="lg:col-span-2">
+                        <div id="mediaGalleryList" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <!-- Injected Gallery Items -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEGACY ARCHIVE -->
+            <section id="archiveSection" class="space-y-12">
+                <div class="flex justify-between items-end border-b border-white/5 pb-8 text-left">
+                    <div>
+                        <h2 class="text-2xl font-black uppercase tracking-widest text-white">Home <span class="text-red-600">Archive</span></h2>
+                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2 italic">Management of assets rendered on the main index carousel</p>
+                    </div>
+                </div>
+                
+                <div class="grid lg:grid-cols-3 gap-12">
+                    <div class="lg:col-span-1 glass-panel p-10 space-y-8">
                         <form id="galleryForm" class="space-y-6">
                             <input type="text" id="galTitle" placeholder="DATA RECORD LABEL" required class="text-white">
                             <input type="text" id="galLog" placeholder="LOG_INDEX (e.g. CORE_01)" class="font-mono text-white">
@@ -354,11 +413,8 @@
                         </form>
                     </div>
 
-                    <!-- Archive List -->
                     <div class="lg:col-span-2">
-                        <div id="archiveList" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <!-- Archived images go here -->
-                        </div>
+                        <div id="archiveList" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
                     </div>
                 </div>
             </section>
@@ -371,24 +427,23 @@
                         <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2">Communications intercepted from the grid terminal</p>
                     </div>
                 </div>
-                <div id="signalList" class="grid grid-cols-1 xl:grid-cols-2 gap-8 max-h-[1200px] overflow-y-auto pr-4 custom-scrollbar">
-                    <!-- Signals injected here -->
-                </div>
+                <div id="signalList" class="grid grid-cols-1 xl:grid-cols-2 gap-8 max-h-[1200px] overflow-y-auto pr-4 custom-scrollbar"></div>
             </section>
         </main>
     </div>
 
-    <!-- Hidden inputs for file interaction -->
+    <!-- Hidden file inputs -->
     <input type="file" id="evFile" class="hidden">
     <input type="file" id="galFile" class="hidden">
+    <input type="file" id="mgFile" class="hidden">
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        // APP INIT
+        // INIT
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyCJv9cd_QhzNiwC2_nDd4LwnMANhBOsET8",
             authDomain: "popetown-productions-llc.firebaseapp.com",
@@ -408,7 +463,7 @@
 
         let activeListeners = [];
         let isStaffAuthorized = false;
-        let masterData = { events: [], signals: [], archive: [] };
+        let masterData = { events: [], signals: [], archive: [], media_gallery: [] };
 
         const toast = (msg) => {
             const el = document.getElementById('errorToast');
@@ -427,19 +482,17 @@
 
         function startStreams() {
             if (!auth.currentUser) return;
-            const nodeStatus = document.getElementById('nodeStatus');
             const paths = {
                 events: collection(db, 'artifacts', appId, 'public', 'data', 'events'),
                 signals: collection(db, 'artifacts', appId, 'public', 'data', 'inquiries'),
-                archive: collection(db, 'artifacts', appId, 'public', 'data', 'gallery')
+                archive: collection(db, 'artifacts', appId, 'public', 'data', 'gallery'),
+                mg: collection(db, 'artifacts', appId, 'public', 'data', 'media_gallery')
             };
 
             activeListeners.push(onSnapshot(paths.events, (snap) => {
                 masterData.events = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 document.getElementById('statEvents').innerText = masterData.events.length.toString().padStart(2, '0');
                 renderEvents();
-                nodeStatus.innerText = "Network: Stable";
-                nodeStatus.className = "text-[9px] font-mono bg-zinc-900 px-6 py-2 border border-green-500/20 text-green-500 uppercase tracking-widest";
             }));
 
             activeListeners.push(onSnapshot(paths.signals, (snap) => {
@@ -452,64 +505,75 @@
                 masterData.archive = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 renderArchive();
             }));
+
+            activeListeners.push(onSnapshot(paths.mg, (snap) => {
+                masterData.media_gallery = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderMediaGallery();
+            }));
+        }
+
+        // RENDERERS
+        function renderMediaGallery() {
+            const list = document.getElementById('mediaGalleryList');
+            if (masterData.media_gallery.length === 0) {
+                list.innerHTML = `<div class="col-span-2 py-10 text-center text-[9px] text-zinc-700 uppercase tracking-widest italic">Media Core Offline</div>`;
+                return;
+            }
+            list.innerHTML = masterData.media_gallery.map(i => {
+                const isVideo = i.type === 'video';
+                return `
+                <div class="glass-panel group relative aspect-video overflow-hidden bg-black text-left">
+                    ${isVideo ? 
+                        `<video src="${i.url}" muted loop playsinline class="w-full h-full object-cover opacity-60"></video>` : 
+                        `<img src="${i.url}" class="w-full h-full object-cover opacity-60">`}
+                    <div class="absolute inset-0 p-6 flex flex-col justify-end bg-gradient-to-t from-black to-transparent">
+                        <p class="text-[9px] font-black uppercase text-red-600 mb-1 tracking-widest">${i.category || 'Capture'}</p>
+                        <h4 class="text-xs font-bold text-white uppercase">${i.title}</h4>
+                        <div class="mt-4 flex gap-2">
+                            <button onclick="window.purgeNode('media_gallery', '${i.id}')" class="bg-red-600/20 text-red-500 border border-red-600/30 p-2 hover:bg-red-600 hover:text-white transition-all">
+                                <i data-lucide="trash-2" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            if (window.lucide) lucide.createIcons();
+            document.querySelectorAll('#mediaGalleryList video').forEach(v => v.play().catch(()=>{}));
         }
 
         function renderEvents() {
             const list = document.getElementById('eventList');
-            const q = document.getElementById('globalSearch')?.value?.toLowerCase() || '';
-            const filtered = masterData.events.filter(e => e.title?.toLowerCase().includes(q) || e.status?.toLowerCase().includes(q));
-            
-            if (filtered.length === 0) {
-                list.innerHTML = `<div class="py-20 text-center text-[10px] text-zinc-800 uppercase tracking-[1em]">Void Node: No Match</div>`;
-                return;
-            }
-
-            list.innerHTML = filtered.map(item => {
-                const badgeClass = item.status === 'Live Now' ? 'border-red-600 text-red-500' : 'border-green-600 text-green-500';
-                return `
-                    <div class="glass-panel p-8 flex flex-col md:flex-row justify-between items-center gap-8 group text-left relative overflow-hidden">
-                        <div class="flex items-center gap-8 w-full">
-                            <div class="w-24 h-24 bg-black border border-white/5 flex-shrink-0 overflow-hidden relative">
-                                ${item.imagePath ? `<img src="${item.imagePath}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">` : `<div class="w-full h-full flex items-center justify-center text-[8px] opacity-10">NULL</div>`}
-                            </div>
-                            <div class="space-y-2 flex-1">
-                                <span class="px-2 py-0.5 rounded-full border ${badgeClass} text-[8px] font-black uppercase tracking-widest">${item.status}</span>
-                                <h4 class="text-xl font-black uppercase tracking-tighter text-white group-hover:text-red-500 transition-colors italic">${item.title}</h4>
-                                <p class="text-[9px] text-zinc-500 uppercase font-mono tracking-widest">LOG: ${item.id.slice(0,8)}</p>
-                                ${item.ticketLink ? `<a href="${item.ticketLink}" target="_blank" class="inline-block text-[9px] text-red-500 font-black uppercase tracking-widest border-b border-red-600/30 hover:border-red-600 mt-2">:: ACCESS_PORTAL</a>` : ''}
-                            </div>
+            list.innerHTML = masterData.events.map(item => `
+                <div class="glass-panel p-8 flex flex-col md:flex-row justify-between items-center gap-8 group text-left">
+                    <div class="flex items-center gap-8 w-full">
+                        <div class="w-24 h-24 bg-black border border-white/5 flex-shrink-0 overflow-hidden relative">
+                            ${item.imagePath ? `<img src="${item.imagePath}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-[8px] opacity-10">NULL</div>`}
                         </div>
-                        <div class="flex md:flex-col gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="window.editNode('${item.id}')" class="text-[9px] text-white uppercase border border-white/10 px-8 py-3 hover:bg-white/5 font-black tracking-widest">EDIT</button>
-                            <button onclick="window.clearNodeImage('${item.id}')" class="text-[9px] text-zinc-400 uppercase border border-white/5 px-8 py-3 hover:text-red-500 font-black tracking-widest">PURGE_PHOTO</button>
-                            <button onclick="window.purgeNode('events', '${item.id}')" class="text-[9px] text-white uppercase bg-red-600/10 border border-red-600/20 px-8 py-3 hover:bg-red-600 font-black tracking-widest">TERMINATE</button>
+                        <div class="space-y-2 flex-1">
+                            <span class="px-2 py-0.5 rounded-full border border-red-600 text-[8px] text-red-500 font-black uppercase">${item.status}</span>
+                            <h4 class="text-xl font-black italic uppercase text-white">${item.title}</h4>
+                            ${item.ticketLink ? `<a href="${item.ticketLink}" target="_blank" class="text-[8px] text-red-500 font-bold uppercase tracking-widest border-b border-red-600/30">:: VIEW_TICKETS</a>` : ''}
                         </div>
                     </div>
-                `;
-            }).join('');
+                    <div class="flex md:flex-col gap-3">
+                        <button onclick="window.editNode('${item.id}')" class="text-[9px] text-white uppercase border border-white/10 px-8 py-3 hover:bg-white/5 font-black">EDIT</button>
+                        <button onclick="window.purgeNode('events', '${item.id}')" class="text-[9px] text-white uppercase bg-red-600/10 border border-red-600/20 px-8 py-3 hover:bg-red-600 font-black">PURGE</button>
+                    </div>
+                </div>
+            `).join('');
             if (window.lucide) lucide.createIcons();
         }
 
         function renderArchive() {
             const list = document.getElementById('archiveList');
-            if (masterData.archive.length === 0) {
-                list.innerHTML = `<div class="col-span-2 py-10 text-center text-[9px] text-zinc-700 uppercase tracking-widest">Archive Void</div>`;
-                return;
-            }
             list.innerHTML = masterData.archive.map(i => `
-                <div class="glass-panel group relative aspect-square overflow-hidden bg-black">
-                    <img src="${i.imageURL}" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent p-6 flex flex-col justify-end">
-                        <p class="text-[10px] font-black uppercase tracking-widest text-white">${i.title}</p>
-                        <p class="text-[8px] font-mono text-zinc-500 mt-1 uppercase">${i.logId || 'UNTAGGED'}</p>
-                        <div class="mt-4 flex gap-2 translate-y-10 group-hover:translate-y-0 transition-transform">
-                            <button onclick="window.purgeNode('gallery', '${i.id}')" class="bg-red-600 text-white p-2 rounded hover:bg-red-500 transition-colors">
-                                <i data-lucide="trash-2" class="w-3 h-3"></i>
-                            </button>
-                            <a href="${i.imageURL}" target="_blank" class="bg-white/10 text-white p-2 rounded hover:bg-white/20 transition-colors">
-                                <i data-lucide="external-link" class="w-3 h-3"></i>
-                            </a>
-                        </div>
+                <div class="glass-panel group relative aspect-square overflow-hidden bg-black text-left">
+                    <img src="${i.imageURL}" class="w-full h-full object-cover opacity-60">
+                    <div class="absolute inset-0 p-6 flex flex-col justify-end">
+                        <p class="text-[10px] font-black uppercase text-white">${i.title}</p>
+                        <button onclick="window.purgeNode('gallery', '${i.id}')" class="mt-4 bg-red-600 p-2 w-fit rounded hover:bg-red-500">
+                            <i data-lucide="trash-2" class="w-3 h-3 text-white"></i>
+                        </button>
                     </div>
                 </div>
             `).join('');
@@ -518,42 +582,25 @@
 
         function renderSignals() {
             const list = document.getElementById('signalList');
-            const filtered = masterData.signals;
-            list.innerHTML = filtered.map(i => `
+            list.innerHTML = masterData.signals.map(i => `
                 <div class="glass-panel p-10 border-l-4 ${i.flagged ? 'border-red-600' : 'border-white/5'} space-y-6 text-left">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-lg font-black text-red-600 uppercase tracking-tighter italic">${i.fullName}</p>
-                            <p class="text-[9px] text-zinc-600 uppercase font-mono tracking-widest">${i.email}</p>
-                        </div>
+                    <div>
+                        <p class="text-lg font-black text-red-600 uppercase italic">${i.fullName}</p>
+                        <p class="text-[9px] text-zinc-600 uppercase font-mono">${i.email}</p>
                     </div>
                     <p class="text-sm text-zinc-400 italic border-l border-white/10 pl-6">"${i.message}"</p>
                     <div class="flex justify-between items-center pt-4 border-t border-white/5">
                         <button onclick="window.flagNode('${i.id}', ${!i.flagged})" class="text-[9px] font-black uppercase tracking-widest ${i.flagged ? 'text-red-500' : 'text-zinc-700'}">:: FLAG</button>
-                        <button onclick="window.purgeNode('inquiries', '${i.id}')" class="text-[9px] text-zinc-800 hover:text-red-600 font-black uppercase">PURGE</button>
+                        <button onclick="window.purgeNode('inquiries', '${i.id}')" class="text-[9px] text-zinc-800 hover:text-red-600 font-black">TERMINATE</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        // ASSET MANAGEMENT
-        window.clearAsset = (prefix) => {
-            document.getElementById(`${prefix}ImageData`).value = "";
-            document.getElementById(`${prefix}Preview`).classList.add('hidden');
-            document.getElementById(`${prefix}Prompt`).classList.remove('hidden');
-            document.getElementById(`${prefix}ImageActions`).classList.add('hidden');
-        };
-
-        window.clearNodeImage = async (id) => {
-            if (!confirm("PURGE IMAGE FROM THIS BROADCAST?")) return;
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', id), { imagePath: "" });
-                toast("ASSET_PURGED_FROM_BROADCAST");
-            } catch (e) { toast("PURGE_FAIL"); }
-        };
-
+        // ASSET UPLINK
         const uploadFile = async (file, progressEl, containerEl) => {
             return new Promise((resolve, reject) => {
+                if (!auth.currentUser) return reject("UNAUTHORIZED");
                 const path = `artifacts/${appId}/public/assets/${Date.now()}_${file.name.replace(/\s/g, '_')}`;
                 const task = uploadBytesResumable(ref(storage, path), file);
                 containerEl.classList.remove('hidden');
@@ -565,14 +612,44 @@
             });
         };
 
+        window.clearAsset = (prefix) => {
+            document.getElementById(`${prefix}ImageData`).value = "";
+            document.getElementById(`${prefix}Preview`).classList.add('hidden');
+            if(document.getElementById(`${prefix}VideoPreview`)) document.getElementById(`${prefix}VideoPreview`).classList.add('hidden');
+            document.getElementById(`${prefix}Prompt`).classList.remove('hidden');
+            document.getElementById(`${prefix}ImageActions`).classList.add('hidden');
+        };
+
         // HANDLERS
-        document.getElementById('loginForm').onsubmit = (e) => {
+        document.getElementById('loginForm').onsubmit = async (e) => {
             e.preventDefault();
-            if (document.getElementById('loginPass').value.length >= 8) toggleInterface(true);
-            else toast("ACCESS_DENIED");
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch(err) { toast("AUTH_FAILED // ACCESS_DENIED"); }
         };
 
         document.getElementById('logoutBtn').onclick = () => { toggleInterface(false); signOut(auth); };
+
+        document.getElementById('mediaGalleryForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('mgBtn');
+            btn.disabled = true;
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'media_gallery'), {
+                    title: document.getElementById('mgTitle').value,
+                    type: document.getElementById('mgType').value,
+                    category: document.getElementById('mgCategory').value,
+                    url: document.getElementById('mgImageData').value,
+                    timestamp: serverTimestamp()
+                });
+                toast("MEDIA_BROADCAST_SUCCESS");
+                e.target.reset();
+                window.clearAsset('mg');
+            } catch(err) { toast("BROADCAST_FAIL"); }
+            btn.disabled = false;
+        };
 
         document.getElementById('eventForm').onsubmit = async (e) => {
             e.preventDefault();
@@ -591,8 +668,8 @@
                 if (id) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', id), payload);
                 else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'events'), payload);
                 document.getElementById('evCancelBtn').click();
-                toast("BROADCAST_STABLE");
-            } catch (err) { toast("SYNC_ERROR"); }
+                toast("SYNC_SUCCESS");
+            } catch (err) { toast("SYNC_FAIL"); }
             btn.disabled = false;
         };
 
@@ -605,15 +682,12 @@
             document.getElementById('evTicketLink').value = i.ticketLink || '';
             document.getElementById('evDesc').value = i.description || '';
             if (i.date) document.getElementById('evDate').value = i.date.toDate().toISOString().split('T')[0];
-            
             if (i.imagePath) {
                 document.getElementById('evPreview').src = i.imagePath;
                 document.getElementById('evPreview').classList.remove('hidden');
                 document.getElementById('evPrompt').classList.add('hidden');
                 document.getElementById('evImageActions').classList.remove('hidden');
                 document.getElementById('evImageData').value = i.imagePath;
-            } else {
-                window.clearAsset('ev');
             }
             document.getElementById('evCancelBtn').classList.remove('hidden');
             window.scrollTo({ top: document.getElementById('eventSection').offsetTop - 120, behavior: 'smooth' });
@@ -632,28 +706,42 @@
         };
 
         window.purgeNode = async (c, id) => {
-            if (!confirm("PERMANENTLY TERMINATE THIS NODE FROM CORE?")) return;
+            if (!confirm("PURGE PERMANENTLY FROM CORE?")) return;
             try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', c, id)); toast("NODE_PURGED"); }
             catch (e) { toast("PURGE_REJECTED"); }
         };
 
-        const setupUploader = (inputId, prevId, dataId, promptId, actionsId, cId, bId) => {
+        // FILE UPLOAD TRIGGERS
+        const setupUploader = (inputId, prevId, vidPrevId, dataId, promptId, actionsId, cId, bId) => {
             document.getElementById(inputId).onchange = async (e) => {
                 const f = e.target.files[0]; if (!f) return;
                 try {
                     const url = await uploadFile(f, document.getElementById(bId), document.getElementById(cId));
-                    document.getElementById(prevId).src = url;
-                    document.getElementById(prevId).classList.remove('hidden');
+                    document.getElementById(dataId).value = url;
                     document.getElementById(promptId).classList.add('hidden');
                     document.getElementById(actionsId).classList.remove('hidden');
-                    document.getElementById(dataId).value = url;
-                    toast("SIGNAL_LOCKED");
+                    
+                    if (f.type.startsWith('video/')) {
+                        if(vidPrevId) {
+                            const v = document.getElementById(vidPrevId);
+                            v.src = url; v.classList.remove('hidden'); v.play();
+                            if(prevId) document.getElementById(prevId).classList.add('hidden');
+                        }
+                    } else {
+                        if(prevId) {
+                            const i = document.getElementById(prevId);
+                            i.src = url; i.classList.remove('hidden');
+                            if(vidPrevId) document.getElementById(vidPrevId).classList.add('hidden');
+                        }
+                    }
+                    toast("SIGNAL_BROADCAST_LOCKED");
                 } catch (err) { toast("UPLINK_ABORTED"); }
             };
         };
 
-        setupUploader('evFile', 'evPreview', 'evImageData', 'evPrompt', 'evImageActions', 'evProgressContainer', 'evProgressBar');
-        setupUploader('galFile', 'galPreview', 'galImageData', 'galPrompt', 'galImageActions', 'galProgressContainer', 'galProgressBar');
+        setupUploader('evFile', 'evPreview', null, 'evImageData', 'evPrompt', 'evImageActions', 'evProgressContainer', 'evProgressBar');
+        setupUploader('galFile', 'galPreview', null, 'galImageData', 'galPrompt', 'galImageActions', 'galProgressContainer', 'galProgressBar');
+        setupUploader('mgFile', 'mgPreview', 'mgVideoPreview', 'mgImageData', 'mgPrompt', 'mgImageActions', 'mgProgressContainer', 'mgProgressBar');
 
         document.getElementById('galleryForm').onsubmit = async (e) => {
             e.preventDefault();
@@ -675,9 +763,8 @@
 
         function initThree() {
             const container = document.getElementById('canvas-container');
-            if (!container || container.children.length > 0) return;
-            const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-            const ren = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            if (!container || container.innerHTML !== "") return;
+            const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000), ren = new THREE.WebGLRenderer({ alpha: true, antialias: true });
             ren.setSize(window.innerWidth, window.innerHeight);
             container.appendChild(ren.domElement);
             const pts = []; for (let i=0; i<2500; i++) pts.push(THREE.MathUtils.randFloatSpread(50), THREE.MathUtils.randFloatSpread(50), THREE.MathUtils.randFloatSpread(50));
@@ -689,19 +776,21 @@
         }
 
         window.onload = async () => {
+            const stat = document.getElementById('initStatus');
             try {
                 if (initialToken) await signInWithCustomToken(auth, initialToken);
                 else await signInAnonymously(auth);
-                document.getElementById('initStatus').innerText = "Link Stable // Staff Required";
-            } catch (err) { document.getElementById('initStatus').innerText = "Grid Link Failure"; }
+                stat.innerText = "Link Stable // Staff Credentials Required";
+            } catch (err) { stat.innerText = "Grid Link Failure"; }
             
             onAuthStateChanged(auth, (user) => {
-                if (!user) toggleInterface(false);
+                if (user && !user.isAnonymous) toggleInterface(true);
+                else toggleInterface(false);
             });
             if (window.lucide) lucide.createIcons();
         };
 
-        document.getElementById('globalSearch').oninput = () => { renderEvents(); renderSignals(); renderArchive(); };
+        document.getElementById('globalSearch').oninput = () => { renderEvents(); renderSignals(); renderArchive(); renderMediaGallery(); };
     </script>
 </body>
 </html>
