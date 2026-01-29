@@ -12,8 +12,9 @@
     <style>
         :root { --brand-red: #ff0000; --bg-black: #050505; }
         body { background-color: var(--bg-black); color: #ffffff; font-family: 'Inter', sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
-        h1, h2, h3, .nav-link { font-family: 'Orbitron', sans-serif; }
+        h1, h2, h3, .nav-item { font-family: 'Orbitron', sans-serif; }
         
+        /* Persistent Navigation Fix */
         #mainNav {
             position: fixed !important;
             top: 0 !important;
@@ -83,6 +84,18 @@
             background: rgba(255, 0, 0, 0.1);
         }
 
+        .nav-link { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; color: white; text-decoration: none; }
+        .nav-link:hover { color: var(--brand-red); }
+
+        /* Mobile Menu */
+        #mobileMenu { 
+            position: fixed; top: 80px; left: 0; width: 100%; height: calc(100vh - 80px);
+            background: black; z-index: 9998; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; gap: 3rem;
+            transform: translateX(100%); transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #mobileMenu.open { transform: translateX(0); }
+
         .media-info {
             position: absolute;
             bottom: 0;
@@ -138,23 +151,42 @@
     <!-- Navigation -->
     <nav id="mainNav">
         <div class="max-w-7xl mx-auto w-full px-8 flex justify-between items-center">
-            <div class="flex items-center gap-12">
+            <div class="flex items-center gap-12 text-left">
                 <a href="index.html" class="text-xl md:text-2xl font-bold uppercase tracking-tighter italic text-white no-underline">
                     POPETOWN <span class="neon-accent">PRODUCTIONS</span>
                 </a>
+                
+                <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center gap-8 border-l border-white/10 pl-8">
-                    <a href="index.html" class="text-[10px] font-bold tracking-[0.2em] hover:text-red-500 transition-colors uppercase text-white no-underline">Grid_Main</a>
-                    <a href="#" class="text-[10px] font-bold tracking-[0.2em] text-red-500 transition-colors uppercase no-underline">Media_Core</a>
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="#" class="nav-link" style="color: var(--brand-red)">Gallery</a>
+                    <a href="newsletter.html" class="nav-link">Newsletter</a>
                 </div>
             </div>
-            <a href="index.html#contact" class="text-[10px] font-black uppercase border border-red-600 px-6 py-2 hover:bg-red-600 transition-all tracking-widest text-white no-underline">Contact_Uplink</a>
+
+            <div class="flex items-center gap-4">
+                <a href="admin.html" class="hidden md:block text-[10px] font-bold text-zinc-500 hover:text-red-500 uppercase tracking-widest transition-colors no-underline">Staff_Login</a>
+                
+                <!-- Hamburger Toggle -->
+                <button id="menuToggle" class="md:hidden p-2 text-white border border-red-600/30 rounded bg-red-600/5">
+                    <i data-lucide="menu" class="w-8 h-8"></i>
+                </button>
+            </div>
         </div>
     </nav>
+
+    <!-- Mobile Navigation Overlay -->
+    <div id="mobileMenu">
+        <a href="index.html" class="mobile-link text-3xl font-bold uppercase tracking-widest text-white no-underline">Home</a>
+        <a href="#" class="mobile-link text-3xl font-bold uppercase tracking-widest text-red-600 no-underline">Gallery</a>
+        <a href="newsletter.html" class="mobile-link text-3xl font-bold uppercase tracking-widest text-white no-underline">Newsletter</a>
+        <a href="admin.html" class="mt-8 border-2 border-red-600 px-10 py-4 text-red-600 uppercase font-black tracking-widest no-underline">Staff Access</a>
+    </div>
 
     <!-- Header -->
     <header class="pt-48 pb-20 px-8 max-w-7xl mx-auto text-left">
         <p class="text-red-600 font-black tracking-[0.5em] text-[10px] uppercase mb-4 animate-pulse">:: Visual Archive Database ::</p>
-        <h1 class="text-6xl md:text-8xl font-black uppercase tracking-tighter italic leading-none mb-10">MEDIA<br><span class="neon-accent">GALLERY</span></h1>
+        <h1 class="text-6xl md:text-8xl font-black uppercase tracking-tighter italic leading-none mb-10 text-white">MEDIA<br><span class="neon-accent">GALLERY</span></h1>
         
         <div class="flex flex-wrap gap-4 mt-12 border-t border-white/5 pt-8">
             <button onclick="filterGallery('all')" class="filter-btn active" id="btn-all">All_Assets</button>
@@ -166,7 +198,6 @@
     <!-- Gallery Grid -->
     <main class="px-8 pb-40 max-w-7xl mx-auto">
         <div id="media-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
-            <!-- Shimmer Loading -->
             <div class="media-card glass-panel bg-zinc-900/20 animate-pulse"></div>
             <div class="media-card glass-panel bg-zinc-900/20 animate-pulse"></div>
             <div class="media-card glass-panel bg-zinc-900/20 animate-pulse"></div>
@@ -174,7 +205,7 @@
     </main>
 
     <footer class="py-20 border-t border-white/5 text-center px-8">
-        <p class="text-[9px] tracking-[0.4em] text-zinc-600 uppercase mb-8">&copy; 2026 POPETOWN MEDIA CORE // BROADCASTING WORLDWIDE</p>
+        <p class="text-[9px] tracking-[0.4em] text-zinc-600 uppercase mb-8 italic font-black">&copy; 2026 POPETOWN MEDIA CORE // BROADCASTING WORLDWIDE</p>
     </footer>
 
     <script type="module">
@@ -182,7 +213,7 @@
         import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // CONFIG
+        // Project Config
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'popetown-productions-llc';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyCJv9cd_QhzNiwC2_nDd4LwnMANhBOsET8",
@@ -200,34 +231,37 @@
         let allMedia = [];
         let currentFilter = 'all';
 
-        // Global decoder triggers
+        // UI Handlers
+        function initUI() {
+            const t = document.getElementById('menuToggle');
+            const m = document.getElementById('mobileMenu');
+            if(t && m) {
+                t.onclick = () => m.classList.toggle('open');
+                document.querySelectorAll('.mobile-link').forEach(l => l.onclick = () => m.classList.remove('open'));
+            }
+        }
+
         window.onAssetLoad = (el) => el.classList.add('loaded');
 
-        // CORS Fallback - Same as index.html for high-res assets
         window.handleMediaError = (el) => {
             if (el.hasAttribute('crossorigin')) {
                 el.removeAttribute('crossorigin');
                 const src = el.src || (el.querySelector('source') ? el.querySelector('source').src : '');
-                if (el.tagName === 'VIDEO') {
-                    el.load();
-                } else {
-                    el.src = src;
-                }
+                if (el.tagName === 'VIDEO') el.load();
+                else el.src = src;
             }
         };
 
         const performAuth = async () => {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                else await signInAnonymously(auth);
             } catch (err) { await signInAnonymously(auth); }
         };
 
         window.onload = async () => {
             initThree();
+            initUI();
             await performAuth();
             
             onAuthStateChanged(auth, (user) => {
@@ -272,7 +306,6 @@
             }).join('');
             
             lucide.createIcons();
-            // Start visible videos
             document.querySelectorAll('video').forEach(v => v.play().catch(() => {}));
         };
 
@@ -303,6 +336,11 @@
             cam.position.z = 12;
             function anim() { requestAnimationFrame(anim); sc.rotation.y += 0.0002; ren.render(sc, cam); }
             anim();
+            window.addEventListener('resize', () => { 
+                cam.aspect=window.innerWidth/window.innerHeight; 
+                cam.updateProjectionMatrix(); 
+                ren.setSize(window.innerWidth, window.innerHeight); 
+            });
         }
     </script>
 </body>

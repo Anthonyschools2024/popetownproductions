@@ -3,165 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POPETOWN Admin | Command Center v4.2</title>
-    <!-- Tailwind CSS -->
+    <title>POPETOWN Admin | Command Center v4.4</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --brand-red: #ff0000;
-            --bg-black: #050505;
-            --panel-bg: rgba(10, 10, 10, 0.95);
-        }
-        body {
-            background-color: var(--bg-black);
-            color: #ffffff;
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-        }
+        :root { --brand-red: #ff0000; --bg-black: #050505; --panel-bg: rgba(10, 10, 10, 0.95); }
+        body { background-color: var(--bg-black); color: #ffffff; font-family: 'Inter', sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
         h1, h2, h3 { font-family: 'Orbitron', sans-serif; }
         
         #adminNav {
-            position: fixed !important;
-            top: 0 !important; left: 0 !important;
-            width: 100% !important; height: 80px !important;
-            z-index: 9999; 
-            background: rgba(0, 0, 0, 0.98) !important;
-            backdrop-filter: blur(25px);
-            border-bottom: 1px solid rgba(255, 0, 0, 0.3);
-            display: none; 
-            align-items: center;
-            padding: 0 2rem;
+            position: fixed !important; top: 0 !important; left: 0 !important;
+            width: 100% !important; height: 80px !important; z-index: 9999; 
+            background: rgba(0, 0, 0, 0.98) !important; backdrop-filter: blur(25px);
+            border-bottom: 1px solid rgba(255, 0, 0, 0.3); display: none; 
+            align-items: center; padding: 0 2rem;
         }
 
         .glass-panel {
-            background: var(--panel-bg);
-            border: 1px solid rgba(255, 0, 0, 0.15);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-            border-radius: 4px;
+            background: var(--panel-bg); border: 1px solid rgba(255, 0, 0, 0.15);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); border-radius: 4px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .glass-panel:hover { border-color: rgba(255, 0, 0, 0.5); }
 
-        .neon-accent {
-            color: var(--brand-red);
-            text-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
-        }
+        .neon-accent { color: var(--brand-red); text-shadow: 0 0 15px rgba(255, 0, 0, 0.8); }
 
         .btn-red {
-            background: var(--brand-red);
-            color: white;
-            padding: 14px 28px;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 3px;
-            transition: 0.4s;
-            cursor: pointer;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-size: 11px;
+            background: var(--brand-red); color: white; padding: 14px 28px;
+            text-transform: uppercase; font-weight: 700; letter-spacing: 3px;
+            transition: 0.4s; cursor: pointer; border: none;
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 10px; font-size: 11px;
         }
-
-        .btn-red:hover:not(:disabled) {
-            box-shadow: 0 0 30px rgba(255, 0, 0, 0.7);
-            filter: brightness(1.2);
-        }
-        
+        .btn-red:hover:not(:disabled) { box-shadow: 0 0 30px rgba(255, 0, 0, 0.7); filter: brightness(1.2); }
         .btn-red:disabled { opacity: 0.3; cursor: wait; }
 
-        .nav-link {
-            color: #666;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: 0.3s;
-            padding: 10px 15px;
-        }
-        .nav-link:hover { color: white; background: rgba(255, 0, 0, 0.1); }
+        .nav-link { color: #666; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; padding: 10px 15px; }
+        .nav-link:hover { color: white; }
 
         .file-upload-wrapper {
-            border: 2px dashed rgba(255, 0, 0, 0.1);
-            height: 220px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.01);
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
+            border: 2px dashed rgba(255, 0, 0, 0.1); height: 220px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.01); position: relative; overflow: hidden;
         }
 
-        .asset-actions {
-            position: absolute;
-            top: 15px; right: 15px;
-            display: flex; gap: 10px;
-            z-index: 50;
-        }
+        .asset-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 50; }
+        .asset-btn { background: rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px; border-radius: 4px; cursor: pointer; }
+        .asset-btn:hover { background: #ff0000; }
 
-        .asset-btn {
-            background: rgba(0,0,0,0.9);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white; padding: 8px;
-            border-radius: 4px; cursor: pointer;
-            transition: 0.2s;
-        }
-        .asset-btn:hover { background: #ff0000; border-color: #ff0000; }
+        .progress-container { width: 100%; height: 6px; background: rgba(0,0,0,0.4); position: absolute; bottom: 0; left: 0; }
+        .progress-bar { height: 100%; background: var(--brand-red); width: 0%; transition: width 0.2s; }
 
-        .progress-container {
-            width: 100%; height: 6px;
-            background: rgba(0,0,0,0.4);
-            position: absolute; bottom: 0; left: 0;
-        }
-        .progress-bar {
-            height: 100%; background: var(--brand-red);
-            width: 0%; transition: width 0.2s;
-            box-shadow: 0 0 15px var(--brand-red);
-        }
+        input, textarea, select { background: rgba(15, 15, 15, 0.9); border: 1px solid rgba(255, 255, 255, 0.05); color: white; padding: 1rem; outline: none; width: 100%; font-size: 13px; }
+        input:focus, textarea:focus { border-color: var(--brand-red); }
 
-        #canvas-container {
-            position: fixed; top: 0; left: 0; z-index: -1;
-            width: 100%; height: 100%; pointer-events: none;
-        }
-
-        input, textarea, select {
-            background: rgba(15, 15, 15, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            color: white; padding: 1rem;
-            outline: none; width: 100%;
-            font-size: 13px;
-        }
-        input:focus { border-color: var(--brand-red); background: rgba(20, 20, 20, 1); }
-
-        #accessBarrier {
-            position: fixed; inset: 0;
-            background: #000; z-index: 10000;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        .error-toast {
-            background: #000; color: #ff0000;
-            padding: 1.5rem; position: fixed;
-            bottom: 2rem; right: 2rem; z-index: 11000;
-            font-size: 10px; font-weight: 900;
-            text-transform: uppercase; display: none;
-            border: 1px solid #ff0000;
-            box-shadow: 0 0 40px rgba(255,0,0,0.3);
-        }
+        #accessBarrier { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .error-toast { background: #000; color: #ff0000; padding: 1.5rem; position: fixed; bottom: 2rem; right: 2rem; z-index: 11000; font-size: 10px; font-weight: 900; text-transform: uppercase; display: none; border: 1px solid #ff0000; }
 
         .hidden { display: none !important; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--brand-red); }
+        
+        #canvas-container { position: fixed; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; pointer-events: none; }
     </style>
 </head>
 <body class="custom-scrollbar">
@@ -177,11 +81,11 @@
             
             <form id="loginForm" class="space-y-6 text-left">
                 <div class="space-y-2">
-                    <label class="text-[9px] uppercase text-zinc-600 font-black tracking-widest ml-1">Staff ID / Email</label>
+                    <label class="text-[9px] uppercase text-zinc-600 font-black tracking-widest ml-1 text-left block">Staff Identification</label>
                     <input type="email" id="loginEmail" placeholder="ID_ALPHA_01" required class="font-mono text-white">
                 </div>
                 <div class="space-y-2">
-                    <label class="text-[9px] uppercase text-zinc-600 font-black tracking-widest ml-1">Access Cipher</label>
+                    <label class="text-[9px] uppercase text-zinc-600 font-black tracking-widest ml-1 text-left block">Access Cipher</label>
                     <input type="password" id="loginPass" placeholder="••••••••" required class="text-white">
                 </div>
                 <button type="submit" id="loginBtn" class="btn-red w-full mt-6 shadow-2xl">
@@ -202,6 +106,7 @@
                     </div>
                     <nav class="hidden lg:flex gap-4">
                         <a href="#eventSection" class="nav-link">Production</a>
+                        <a href="#newsletterSection" class="nav-link">Newsletter</a>
                         <a href="#gallerySection" class="nav-link">Media_Core</a>
                         <a href="#archiveSection" class="nav-link">Archive</a>
                         <a href="#signalSection" class="nav-link">Signals</a>
@@ -212,9 +117,7 @@
                         <i data-lucide="search" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600"></i>
                         <input type="text" id="globalSearch" placeholder="SEARCH CORE DATABASE..." class="pl-12 text-[10px] py-3 bg-white/5 border-white/5 w-80 rounded-sm font-bold uppercase tracking-widest focus:border-red-600">
                     </div>
-                    <button id="logoutBtn" class="text-[9px] text-zinc-500 hover:text-white uppercase border border-white/5 px-6 py-2 hover:bg-red-600/20 hover:border-red-600 transition-all font-black tracking-tighter">
-                        TERMINATE_LINK
-                    </button>
+                    <button id="logoutBtn" class="text-[9px] text-zinc-500 hover:text-white uppercase border border-white/5 px-6 py-2 hover:bg-red-600/20 hover:border-red-600 transition-all font-black tracking-tighter">TERMINATE_LINK</button>
                 </div>
             </div>
         </header>
@@ -234,216 +137,133 @@
                     </div>
                 </div>
                 <div class="glass-panel p-6 flex flex-col justify-center text-left">
-                    <p class="text-[9px] text-zinc-500 uppercase font-black tracking-widest mb-1">Intercepted Signals</p>
+                    <p class="text-[9px] text-zinc-500 uppercase font-black tracking-widest mb-1">Intelligence</p>
                     <div class="flex items-baseline gap-2">
-                        <span id="statSignals" class="text-4xl font-black text-white">00</span>
-                        <span class="text-zinc-600 text-xs font-mono">/ TOTAL</span>
+                        <span id="statNewsletter" class="text-4xl font-black text-white">00</span>
+                        <span class="text-zinc-600 text-xs font-mono">/ FEED</span>
                     </div>
                 </div>
             </div>
 
-            <!-- PRODUCTION GRID -->
-            <section id="eventSection" class="space-y-12">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/5 pb-8">
-                    <div class="text-left">
-                        <h2 class="text-2xl font-black uppercase tracking-widest text-white">Production <span class="text-red-600">Grid</span></h2>
-                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2 italic text-left">Deploy and manage live event nodes and ticketing links</p>
-                    </div>
-                    <div id="nodeStatus" class="text-[9px] font-mono bg-zinc-900 px-6 py-2 border border-white/5 text-zinc-500 uppercase tracking-widest mt-4 md:mt-0">Network: Syncing...</div>
-                </div>
-
+            <!-- NEWSLETTER -->
+            <section id="newsletterSection" class="space-y-12">
+                <h2 class="text-2xl font-black uppercase tracking-widest text-white text-left border-b border-white/5 pb-4">Newsletter <span class="text-red-600">Dispatch</span></h2>
                 <div class="grid xl:grid-cols-3 gap-12 items-start">
-                    <!-- Form Container - Fixed sticky behavior for mobile -->
-                    <div class="xl:col-span-1 glass-panel p-6 md:p-10 space-y-8 xl:sticky xl:top-36 z-40 bg-zinc-950">
-                        <h3 class="text-sm font-black uppercase tracking-[0.3em] flex items-center gap-3">
-                            <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span> Node Uplink
-                        </h3>
-                        <form id="eventForm" class="space-y-6">
-                            <input type="hidden" id="editEventId">
-                            <input type="text" id="evTitle" placeholder="PRODUCTION TITLE" required class="text-lg font-bold text-white">
-                            
-                            <div class="grid grid-cols-2 gap-4">
-                                <input type="date" id="evDate" required class="text-white">
-                                <select id="evStatus" class="text-white">
-                                    <option value="Upcoming">UPCOMING</option>
-                                    <option value="Live Now">LIVE NOW</option>
-                                    <option value="Sold Out">SOLD OUT</option>
-                                    <option value="Exclusive">EXCLUSIVE</option>
-                                </select>
+                    <div class="xl:col-span-1 glass-panel p-6 md:p-10 space-y-8 bg-zinc-950">
+                        <form id="newsletterForm" class="space-y-6">
+                            <input type="hidden" id="editNewsletterId">
+                            <input type="text" id="nlTitle" placeholder="DISPATCH TITLE" required class="text-white">
+                            <textarea id="nlContent" rows="8" placeholder="REPORT CONTENT..." required class="text-white text-left text-sm"></textarea>
+                            <div class="file-upload-wrapper" id="nlDropZone">
+                                <div id="nlImageActions" class="asset-actions hidden"><button type="button" onclick="window.clearAsset('nl')" class="asset-btn"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
+                                <div id="nlPrompt" class="flex flex-col items-center justify-center p-6 cursor-pointer" onclick="document.getElementById('nlFile').click()"><p class="text-[9px] text-zinc-500 uppercase font-black">Visual Header</p></div>
+                                <img id="nlPreview" class="hidden h-full w-full object-cover">
+                                <div id="nlProgressContainer" class="progress-container hidden"><div id="nlProgressBar" class="progress-bar"></div></div>
                             </div>
-
-                            <input type="url" id="evTicketLink" placeholder="ADD TICKET PORTAL LINK (OPTIONAL)" class="font-mono text-xs text-white">
-
-                            <textarea id="evDesc" rows="4" placeholder="TECHNICAL BRIEFING DATA..." class="custom-scrollbar text-white text-left"></textarea>
-                            
-                            <div class="file-upload-wrapper group" id="evDropZone">
-                                <div id="evImageActions" class="asset-actions hidden">
-                                    <button type="button" onclick="window.clearAsset('ev')" class="asset-btn" title="Purge Asset">
-                                        <i data-lucide="trash-2" class="w-4 h-4 text-white"></i>
-                                    </button>
-                                </div>
-                                <div id="evPrompt" class="flex flex-col items-center justify-center p-6 text-center cursor-pointer" onclick="document.getElementById('evFile').click()">
-                                    <p class="text-[9px] text-zinc-500 uppercase font-black leading-relaxed">
-                                        Broadcast Visual Asset<br>
-                                        <span class="text-red-600 opacity-60">(Binary Uplink Support: 500MB)</span>
-                                    </p>
-                                </div>
-                                <img id="evPreview" class="hidden h-full w-full object-cover">
-                                <div id="evProgressContainer" class="progress-container hidden">
-                                    <div id="evProgressBar" class="progress-bar"></div>
-                                </div>
-                            </div>
-                            
-                            <input type="hidden" id="evImageData"> 
-
-                            <div class="flex flex-col gap-4">
-                                <button type="submit" id="evBtn" class="btn-red w-full py-5">
-                                    <i data-lucide="zap" class="w-4 h-4"></i> Commit Broadcast
-                                </button>
-                                <button type="button" id="evCancelBtn" class="hidden text-[9px] text-zinc-600 hover:text-white uppercase tracking-widest border border-white/10 px-6 py-2 hover:bg-white/5">ABORT_EDIT</button>
-                            </div>
+                            <input type="hidden" id="nlImageData">
+                            <button type="submit" id="nlBtn" class="btn-red w-full py-5 font-black uppercase">Commit Broadcast</button>
                         </form>
                     </div>
+                    <div class="xl:col-span-2" id="newsletterList"></div>
+                </div>
+            </section>
 
-                    <!-- Event List Container - Now naturally follows on mobile -->
-                    <div class="xl:col-span-2 space-y-6">
-                        <div id="eventList" class="grid gap-6">
-                            <div class="py-20 text-center text-[10px] text-zinc-800 uppercase tracking-[1em] animate-pulse">Establishing Database Link...</div>
-                        </div>
+            <!-- PRODUCTION GRID -->
+            <section id="eventSection" class="space-y-12">
+                <h2 class="text-2xl font-black uppercase tracking-widest text-white text-left border-b border-white/5 pb-4">Production <span class="text-red-600">Grid</span></h2>
+                <div class="grid xl:grid-cols-3 gap-12 items-start">
+                    <div class="xl:col-span-1 glass-panel p-6 md:p-10 space-y-8 bg-zinc-950">
+                        <form id="eventForm" class="space-y-6">
+                            <input type="hidden" id="editEventId">
+                            <input type="text" id="evTitle" placeholder="PRODUCTION TITLE" required class="text-white">
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="date" id="evDate" required class="text-white">
+                                <select id="evStatus" class="text-white"><option value="Upcoming">UPCOMING</option><option value="Live Now">LIVE NOW</option><option value="Sold Out">SOLD OUT</option></select>
+                            </div>
+                            <input type="url" id="evTicketLink" placeholder="TICKET LINK" class="text-white text-xs">
+                            <textarea id="evDesc" rows="4" placeholder="BRIEFING..." class="text-white text-left"></textarea>
+                            <div class="file-upload-wrapper" id="evDropZone">
+                                <div id="evImageActions" class="asset-actions hidden"><button type="button" onclick="window.clearAsset('ev')" class="asset-btn"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
+                                <div id="evPrompt" class="flex flex-col items-center justify-center p-6 cursor-pointer" onclick="document.getElementById('evFile').click()"><p class="text-[9px] text-zinc-500 uppercase font-black">Visual Asset</p></div>
+                                <img id="evPreview" class="hidden h-full w-full object-cover">
+                                <div id="evProgressContainer" class="progress-container hidden"><div id="evProgressBar" class="progress-bar"></div></div>
+                            </div>
+                            <input type="hidden" id="evImageData">
+                            <button type="submit" id="evBtn" class="btn-red w-full py-5 font-black uppercase">Commit Node</button>
+                        </form>
                     </div>
+                    <div class="xl:col-span-2" id="eventList"></div>
                 </div>
             </section>
 
             <!-- MEDIA GALLERY -->
             <section id="gallerySection" class="space-y-12">
-                <div class="flex justify-between items-end border-b border-white/5 pb-8 text-left">
-                    <div>
-                        <h2 class="text-2xl font-black uppercase tracking-widest text-white">Media <span class="text-red-600">Core</span></h2>
-                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2 italic">Broadcast Video & Images directly to the Gallery subpage</p>
-                    </div>
-                </div>
-                
+                <h2 class="text-2xl font-black uppercase tracking-widest text-white text-left border-b border-white/5 pb-4">Media <span class="text-red-600">Core</span></h2>
                 <div class="grid lg:grid-cols-3 gap-12">
                     <div class="lg:col-span-1 glass-panel p-6 md:p-10 space-y-8 bg-zinc-950">
-                        <h3 class="text-sm font-black uppercase tracking-[0.3em]">Direct Media Broadcast</h3>
                         <form id="mediaGalleryForm" class="space-y-6">
                             <input type="text" id="mgTitle" placeholder="ASSET TITLE" required class="text-white">
-                            
-                            <div class="grid grid-cols-2 gap-4">
-                                <select id="mgType" class="text-white">
-                                    <option value="image">Still_Capture</option>
-                                    <option value="video">Motion_Visual</option>
-                                </select>
-                                <input type="text" id="mgCategory" placeholder="CATEGORY" class="text-white text-xs">
-                            </div>
-
-                            <div class="file-upload-wrapper group" id="mgDropZone">
-                                <div id="mgImageActions" class="asset-actions hidden">
-                                    <button type="button" onclick="window.clearAsset('mg')" class="asset-btn">
-                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                    </button>
-                                </div>
-                                <div id="mgPrompt" class="flex flex-col items-center justify-center p-8 text-center cursor-pointer" onclick="document.getElementById('mgFile').click()">
-                                    <p class="text-[9px] text-zinc-500 uppercase font-black leading-relaxed">
-                                        Select Image or Video<br>
-                                        <span class="text-red-600 opacity-60">(Unlimited Capacity)</span>
-                                    </p>
-                                </div>
+                            <select id="mgType" class="text-white"><option value="image">STILL</option><option value="video">MOTION</option></select>
+                            <div class="file-upload-wrapper" id="mgDropZone">
+                                <div id="mgImageActions" class="asset-actions hidden"><button type="button" onclick="window.clearAsset('mg')" class="asset-btn"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
+                                <div id="mgPrompt" class="flex flex-col items-center justify-center p-8 cursor-pointer" onclick="document.getElementById('mgFile').click()"><p class="text-[9px] text-zinc-500 uppercase font-black">Select File</p></div>
                                 <img id="mgPreview" class="hidden h-full w-full object-cover">
                                 <video id="mgVideoPreview" class="hidden h-full w-full object-cover" muted loop playsinline></video>
-                                <div id="mgProgressContainer" class="progress-container hidden">
-                                    <div id="mgProgressBar" class="progress-bar"></div>
-                                </div>
+                                <div id="mgProgressContainer" class="progress-container hidden"><div id="mgProgressBar" class="progress-bar"></div></div>
                             </div>
                             <input type="hidden" id="mgImageData">
-                            <button type="submit" id="mgBtn" class="btn-red w-full py-5">
-                                <i data-lucide="cast" class="w-4 h-4"></i> Broadcast to Gallery
-                            </button>
+                            <button type="submit" id="mgBtn" class="btn-red w-full py-5 font-black uppercase">Broadcast</button>
                         </form>
                     </div>
-
-                    <div class="lg:col-span-2">
-                        <div id="mediaGalleryList" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
-                    </div>
+                    <div class="lg:col-span-2" id="mediaGalleryList" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
                 </div>
             </section>
 
-            <!-- HOME ARCHIVE -->
+            <!-- ARCHIVE -->
             <section id="archiveSection" class="space-y-12">
-                <div class="flex justify-between items-end border-b border-white/5 pb-8 text-left">
-                    <div>
-                        <h2 class="text-2xl font-black uppercase tracking-widest text-white">Home <span class="text-red-600">Archive</span></h2>
-                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2 italic">Carousel management for home index</p>
-                    </div>
-                </div>
-                
+                <h2 class="text-2xl font-black uppercase tracking-widest text-white text-left border-b border-white/5 pb-4">Home <span class="text-red-600">Archive</span></h2>
                 <div class="grid lg:grid-cols-3 gap-12">
-                    <div class="lg:col-span-1 glass-panel p-6 md:p-10 space-y-8 bg-zinc-950">
+                    <div class="lg:col-span-1 glass-panel p-6 md:p-10 bg-zinc-950">
                         <form id="galleryForm" class="space-y-6">
-                            <input type="text" id="galTitle" placeholder="DATA RECORD LABEL" required class="text-white">
-                            <input type="text" id="galLog" placeholder="LOG_INDEX" class="font-mono text-white">
-                            
-                            <div class="file-upload-wrapper group" id="galDropZone">
-                                <div id="galImageActions" class="asset-actions hidden">
-                                    <button type="button" onclick="window.clearAsset('gal')" class="asset-btn">
-                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                    </button>
-                                </div>
-                                <div id="galPrompt" class="flex flex-col items-center justify-center p-8 text-center cursor-pointer" onclick="document.getElementById('galFile').click()">
-                                    <p class="text-[9px] text-zinc-500 uppercase font-black leading-relaxed text-center">
-                                        Upload Capture Metadata<br>
-                                        <span class="text-red-600 opacity-60">(Resumable Sync Active)</span>
-                                    </p>
-                                </div>
+                            <input type="text" id="galTitle" placeholder="ARCHIVE LABEL" required class="text-white">
+                            <div class="file-upload-wrapper" id="galDropZone">
+                                <div id="galImageActions" class="asset-actions hidden"><button type="button" onclick="window.clearAsset('gal')" class="asset-btn"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
+                                <div id="galPrompt" class="p-8 cursor-pointer" onclick="document.getElementById('galFile').click()"><p class="text-[9px] text-zinc-500 uppercase">Archive Photo</p></div>
                                 <img id="galPreview" class="hidden h-full w-full object-cover">
-                                <div id="galProgressContainer" class="progress-container hidden">
-                                    <div id="galProgressBar" class="progress-bar"></div>
-                                </div>
+                                <div id="galProgressContainer" class="progress-container hidden"><div id="galProgressBar" class="progress-bar"></div></div>
                             </div>
                             <input type="hidden" id="galImageData">
-                            <button type="submit" id="galBtn" class="btn-red w-full py-5">
-                                <i data-lucide="hard-drive" class="w-4 h-4"></i> Commit Archive
-                            </button>
+                            <button type="submit" id="galBtn" class="btn-red w-full uppercase py-5">Commit Archive</button>
                         </form>
                     </div>
-
-                    <div class="lg:col-span-2">
-                        <div id="archiveList" class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left"></div>
-                    </div>
+                    <div class="lg:col-span-2" id="archiveList" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
                 </div>
             </section>
 
             <!-- SIGNALS -->
             <section id="signalSection" class="space-y-12">
-                <div class="flex justify-between items-end border-b border-white/5 pb-8 text-left">
-                    <div>
-                        <h2 class="text-2xl font-black uppercase tracking-widest text-white">Signal <span class="text-red-600">Intercept</span></h2>
-                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2">Incoming communication logs</p>
-                    </div>
-                </div>
-                <div id="signalList" class="grid grid-cols-1 xl:grid-cols-2 gap-8 max-h-[1200px] overflow-y-auto pr-4 custom-scrollbar text-left"></div>
+                <h2 class="text-2xl font-black uppercase tracking-widest text-white text-left border-b border-white/5 pb-4">Signal <span class="text-red-600">Intercept</span></h2>
+                <div id="signalList" class="grid gap-6 text-left"></div>
             </section>
         </main>
     </div>
 
-    <!-- External File Inputs -->
-    <input type="file" id="evFile" class="hidden" accept="image/*">
-    <input type="file" id="galFile" class="hidden" accept="image/*">
-    <input type="file" id="mgFile" class="hidden" accept="image/*,video/*">
+    <!-- Hidden file inputs -->
+    <input type="file" id="evFile" class="hidden">
+    <input type="file" id="galFile" class="hidden">
+    <input type="file" id="mgFile" class="hidden">
+    <input type="file" id="nlFile" class="hidden">
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, Timestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        // FIREBASE CONFIG
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyCJv9cd_QhzNiwC2_nDd4LwnMANhBOsET8",
-            authDomain: "popetown-productions-llc.firebaseapp.com",
-            projectId: "popetown-productions-llc",
-            storageBucket: "popetown-productions-llc.firebasestorage.app",
-            messagingSenderId: "436709069476",
+            authDomain: "popetown-productions-llc.firebaseapp.com", projectId: "popetown-productions-llc",
+            storageBucket: "popetown-productions-llc.firebasestorage.app", messagingSenderId: "436709069476",
             appId: "1:436709069476:web:bbc0fcbe160b71fabccc31"
         };
 
@@ -455,103 +275,84 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        let activeListeners = [];
-        let isStaffAuthorized = false;
-        let masterData = { events: [], signals: [], archive: [], media_gallery: [] };
+        let masterData = { events: [], signals: [], archive: [], media_gallery: [], newsletter: [] };
 
         const toast = (msg) => {
             const el = document.getElementById('errorToast');
-            el.innerText = msg; el.style.display = 'block';
+            if(!el) return; el.innerText = msg; el.style.display = 'block';
             setTimeout(() => el.style.display = 'none', 6000);
         };
 
         const toggleInterface = (isAuthorized) => {
-            isStaffAuthorized = isAuthorized;
-            document.getElementById('accessBarrier').classList.toggle('hidden', isAuthorized);
-            document.getElementById('adminContent').classList.toggle('hidden', !isAuthorized);
-            document.getElementById('adminNav').style.display = isAuthorized ? 'flex' : 'none';
+            const barrier = document.getElementById('accessBarrier');
+            const content = document.getElementById('adminContent');
+            const nav = document.getElementById('adminNav');
+            if(barrier) barrier.classList.toggle('hidden', isAuthorized);
+            if(content) content.classList.toggle('hidden', !isAuthorized);
+            if(nav) nav.style.display = isAuthorized ? 'flex' : 'none';
             if (isAuthorized) { initThree(); startStreams(); }
-            else activeListeners.forEach(u => u());
         };
 
         function startStreams() {
-            if (!auth.currentUser) return;
-            const paths = {
-                events: collection(db, 'artifacts', appId, 'public', 'data', 'events'),
-                signals: collection(db, 'artifacts', appId, 'public', 'data', 'inquiries'),
-                archive: collection(db, 'artifacts', appId, 'public', 'data', 'gallery'),
-                mg: collection(db, 'artifacts', appId, 'public', 'data', 'media_gallery')
-            };
-
-            activeListeners.push(onSnapshot(paths.events, (snap) => {
-                masterData.events = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                document.getElementById('statEvents').innerText = masterData.events.length.toString().padStart(2, '0');
-                renderEvents();
-            }));
-
-            activeListeners.push(onSnapshot(paths.signals, (snap) => {
-                masterData.signals = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                document.getElementById('statSignals').innerText = masterData.signals.length.toString().padStart(2, '0');
-                renderSignals();
-            }));
-
-            activeListeners.push(onSnapshot(paths.archive, (snap) => {
-                masterData.archive = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderArchive();
-            }));
-
-            activeListeners.push(onSnapshot(paths.mg, (snap) => {
-                masterData.media_gallery = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderMediaGallery();
-            }));
+            const getPath = (coll) => collection(db, 'artifacts', appId, 'public', 'data', coll);
+            onSnapshot(getPath('events'), (s) => { masterData.events = s.docs.map(d => ({id: d.id, ...d.data()})); renderEvents(); });
+            onSnapshot(getPath('inquiries'), (s) => { masterData.signals = s.docs.map(d => ({id: d.id, ...d.data()})); renderSignals(); });
+            onSnapshot(getPath('gallery'), (s) => { masterData.archive = s.docs.map(d => ({id: d.id, ...d.data()})); renderArchive(); });
+            onSnapshot(getPath('media_gallery'), (s) => { masterData.media_gallery = s.docs.map(d => ({id: d.id, ...d.data()})); renderMediaGallery(); });
+            onSnapshot(query(getPath('newsletter'), orderBy('timestamp', 'desc')), (s) => { 
+                masterData.newsletter = s.docs.map(d => ({id: d.id, ...d.data()})); 
+                if(document.getElementById('statNewsletter')) document.getElementById('statNewsletter').innerText = masterData.newsletter.length.toString().padStart(2, '0');
+                renderNewsletter(); 
+            });
         }
 
-        // RENDER FUNCTIONS
+        // RENDERS
+        function renderNewsletter() {
+            const list = document.getElementById('newsletterList');
+            if(!list) return;
+            list.innerHTML = masterData.newsletter.map(post => `
+                <div class="glass-panel p-8 text-left space-y-6">
+                    <div class="flex justify-between">
+                        <div><h4 class="text-xl font-black italic text-white uppercase">${post.title}</h4></div>
+                        <div class="flex gap-2">
+                            <button onclick="window.editNewsletter('${post.id}')" class="text-[8px] text-white border border-white/10 px-4 py-2 uppercase font-black">EDIT</button>
+                            <button onclick="window.purgeNode('newsletter', '${post.id}')" class="text-[8px] text-red-500 border border-red-500/20 px-4 py-2 uppercase font-black">PURGE</button>
+                        </div>
+                    </div>
+                    <div class="text-xs text-zinc-400 line-clamp-2">${post.content}</div>
+                    <form onsubmit="window.adminComment(event, '${post.id}')" class="flex gap-4 pt-4 border-t border-white/5">
+                        <input type="text" placeholder="DISPATCH REPLY..." class="text-[10px] bg-white/5 flex-1">
+                        <button type="submit" class="bg-red-600 px-6 py-2 text-[10px] font-black uppercase">SEND</button>
+                    </form>
+                </div>`).join('');
+        }
+
         function renderEvents() {
             const list = document.getElementById('eventList');
-            const q = document.getElementById('globalSearch')?.value?.toLowerCase() || '';
-            const filtered = masterData.events.filter(e => e.title?.toLowerCase().includes(q) || e.status?.toLowerCase().includes(q));
-            
-            list.innerHTML = filtered.map(item => `
-                <div class="glass-panel p-8 flex flex-col md:flex-row justify-between items-center gap-8 group text-left">
-                    <div class="flex items-center gap-8 w-full">
-                        <div class="w-24 h-24 bg-black border border-white/5 flex-shrink-0 overflow-hidden relative">
-                            ${item.imagePath ? `<img src="${item.imagePath}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-[8px] opacity-10">NULL</div>`}
-                        </div>
-                        <div class="space-y-2 flex-1">
-                            <span class="px-2 py-0.5 rounded-full border border-red-600 text-[8px] text-red-500 font-black uppercase tracking-widest">${item.status}</span>
-                            <h4 class="text-xl font-black italic uppercase text-white">${item.title}</h4>
-                            ${item.ticketLink ? `<a href="${item.ticketLink}" target="_blank" class="text-[8px] text-red-500 font-bold uppercase tracking-widest border-b border-red-600/30">:: VIEW_TICKETS</a>` : ''}
-                        </div>
+            if(!list) return;
+            if(document.getElementById('statEvents')) document.getElementById('statEvents').innerText = masterData.events.length.toString().padStart(2, '0');
+            list.innerHTML = masterData.events.map(item => `
+                <div class="glass-panel p-6 flex flex-col md:flex-row justify-between items-center gap-6 text-left">
+                    <div class="flex items-center gap-6 w-full">
+                        <div class="w-16 h-16 bg-black border border-white/5 overflow-hidden">${item.imagePath ? `<img src="${item.imagePath}" class="w-full h-full object-cover">` : ''}</div>
+                        <div class="flex-1"><span class="text-[8px] text-red-500 font-black uppercase">${item.status}</span><h4 class="text-lg font-bold text-white uppercase">${item.title}</h4></div>
                     </div>
-                    <div class="flex md:flex-col gap-3">
-                        <button onclick="window.editNode('${item.id}')" class="text-[9px] text-white uppercase border border-white/10 px-8 py-3 hover:bg-white/5 font-black tracking-widest">EDIT</button>
-                        <button onclick="window.purgeNode('events', '${item.id}')" class="text-[9px] text-white uppercase bg-red-600/10 border border-red-600/20 px-8 py-3 hover:bg-red-600 font-black tracking-widest">PURGE</button>
+                    <div class="flex md:flex-col gap-2">
+                        <button onclick="window.editNode('${item.id}')" class="text-[8px] text-white border border-white/10 px-4 py-2 uppercase font-black">EDIT</button>
+                        <button onclick="window.purgeNode('events', '${item.id}')" class="text-[8px] text-red-500 border border-red-500/10 px-4 py-2 uppercase font-black">PURGE</button>
                     </div>
-                </div>
-            `).join('');
-            if (window.lucide) lucide.createIcons();
+                </div>`).join('');
         }
 
         function renderMediaGallery() {
             const list = document.getElementById('mediaGalleryList');
-            if (masterData.media_gallery.length === 0) {
-                list.innerHTML = `<div class="col-span-2 py-10 text-center text-[9px] text-zinc-700 uppercase tracking-widest">Media Core Offline</div>`;
-                return;
-            }
+            if(!list) return;
             list.innerHTML = masterData.media_gallery.map(i => `
                 <div class="glass-panel group relative aspect-video overflow-hidden bg-black text-left">
-                    ${i.type === 'video' ? 
-                        `<video src="${i.url}" muted loop playsinline class="w-full h-full object-cover opacity-60"></video>` : 
-                        `<img src="${i.url}" class="w-full h-full object-cover opacity-60">`}
+                    ${i.type === 'video' ? `<video src="${i.url}" muted loop playsinline class="w-full h-full object-cover opacity-60"></video>` : `<img src="${i.url}" class="w-full h-full object-cover opacity-60">`}
                     <div class="absolute inset-0 p-6 flex flex-col justify-end bg-gradient-to-t from-black to-transparent">
-                        <p class="text-[9px] font-black uppercase text-red-600 mb-1 tracking-widest">${i.category || 'Capture'}</p>
                         <h4 class="text-xs font-bold text-white uppercase">${i.title}</h4>
-                        <div class="mt-4">
-                            <button onclick="window.purgeNode('media_gallery', '${i.id}')" class="bg-red-600/20 text-red-500 border border-red-600/30 p-2 hover:bg-red-600 hover:text-white transition-all">
-                                <i data-lucide="trash-2" class="w-3 h-3"></i>
-                            </button>
-                        </div>
+                        <button onclick="window.purgeNode('media_gallery', '${i.id}')" class="mt-4 bg-red-600/20 text-red-500 border border-red-600/30 p-2 hover:bg-red-600 hover:text-white w-fit"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
                     </div>
                 </div>`).join('');
             if (window.lucide) lucide.createIcons();
@@ -560,14 +361,13 @@
 
         function renderArchive() {
             const list = document.getElementById('archiveList');
+            if(!list) return;
             list.innerHTML = masterData.archive.map(i => `
-                <div class="glass-panel group relative aspect-square overflow-hidden bg-black text-left">
+                <div class="glass-panel group relative aspect-square overflow-hidden bg-black mb-4">
                     <img src="${i.imageURL}" class="w-full h-full object-cover opacity-60">
                     <div class="absolute inset-0 p-6 flex flex-col justify-end">
                         <p class="text-[10px] font-black uppercase text-white">${i.title}</p>
-                        <button onclick="window.purgeNode('gallery', '${i.id}')" class="mt-4 bg-red-600 p-2 w-fit rounded">
-                            <i data-lucide="trash-2" class="w-3 h-3 text-white"></i>
-                        </button>
+                        <button onclick="window.purgeNode('gallery', '${i.id}')" class="mt-4 bg-red-600 p-2 w-fit rounded"><i data-lucide="trash-2" class="w-3 h-3 text-white"></i></button>
                     </div>
                 </div>`).join('');
             if (window.lucide) lucide.createIcons();
@@ -575,193 +375,110 @@
 
         function renderSignals() {
             const list = document.getElementById('signalList');
+            if(!list) return;
             list.innerHTML = masterData.signals.map(i => `
-                <div class="glass-panel p-10 border-l-4 ${i.flagged ? 'border-red-600' : 'border-white/5'} space-y-6 text-left">
-                    <div>
-                        <p class="text-lg font-black text-red-600 uppercase italic">${i.fullName}</p>
-                        <p class="text-[9px] text-zinc-600 uppercase font-mono">${i.email}</p>
-                    </div>
-                    <p class="text-sm text-zinc-400 italic border-l border-white/10 pl-6">"${i.message}"</p>
-                    <div class="flex justify-between items-center pt-4 border-t border-white/5">
-                        <button onclick="window.flagNode('${i.id}', ${!i.flagged})" class="text-[9px] font-black uppercase tracking-widest ${i.flagged ? 'text-red-500' : 'text-zinc-700'}">:: FLAG</button>
-                        <button onclick="window.purgeNode('inquiries', '${i.id}')" class="text-[9px] text-zinc-800 hover:text-red-600 font-black">TERMINATE</button>
+                <div class="glass-panel p-6 border-l-4 ${i.flagged ? 'border-red-600' : 'border-white/5'} space-y-4">
+                    <div class="flex justify-between"><div><p class="text-lg font-black text-red-600 uppercase italic">${i.fullName}</p><p class="text-[9px] text-zinc-600">${i.email}</p></div></div>
+                    <p class="text-sm text-zinc-400 italic">"${i.message}"</p>
+                    <div class="flex gap-4 pt-4 border-t border-white/5">
+                        <button onclick="window.flagNode('${i.id}', ${!i.flagged})" class="text-[9px] font-black uppercase ${i.flagged ? 'text-red-500' : 'text-zinc-700'}">FLAG</button>
+                        <button onclick="window.purgeNode('inquiries', '${i.id}')" class="text-[9px] text-zinc-800 hover:text-red-600 font-black">PURGE</button>
                     </div>
                 </div>`).join('');
         }
 
-        // STORAGE LOGIC
+        // HANDLERS
         const uploadFile = async (file, progressEl, containerEl) => {
             return new Promise((resolve, reject) => {
                 if (!auth.currentUser) return reject("UNAUTHORIZED");
                 const path = `artifacts/${appId}/public/assets/${Date.now()}_${file.name.replace(/\s/g, '_')}`;
                 const task = uploadBytesResumable(ref(storage, path), file);
-                containerEl.classList.remove('hidden');
+                if(containerEl) containerEl.classList.remove('hidden');
                 task.on('state_changed', 
-                    s => progressEl.style.width = (s.bytesTransferred / s.totalBytes) * 100 + '%',
-                    e => { containerEl.classList.add('hidden'); reject(e); },
-                    () => getDownloadURL(task.snapshot.ref).then(url => { containerEl.classList.add('hidden'); resolve(url); })
+                    s => { if(progressEl) progressEl.style.width = (s.bytesTransferred / s.totalBytes) * 100 + '%'; },
+                    e => { if(containerEl) containerEl.classList.add('hidden'); reject(e); },
+                    () => getDownloadURL(task.snapshot.ref).then(url => { if(containerEl) containerEl.classList.add('hidden'); resolve(url); })
                 );
             });
         };
 
         window.clearAsset = (prefix) => {
-            document.getElementById(`${prefix}ImageData`).value = "";
-            document.getElementById(`${prefix}Preview`).classList.add('hidden');
-            if(document.getElementById(`${prefix}VideoPreview`)) document.getElementById(`${prefix}VideoPreview`).classList.add('hidden');
-            document.getElementById(`${prefix}Prompt`).classList.remove('hidden');
-            document.getElementById(`${prefix}ImageActions`).classList.add('hidden');
+            const data = document.getElementById(`${prefix}ImageData`); if(data) data.value = "";
+            const prev = document.getElementById(`${prefix}Preview`); if(prev) prev.classList.add('hidden');
+            const vPrev = document.getElementById(`${prefix}VideoPreview`); if(vPrev) vPrev.classList.add('hidden');
+            const prompt = document.getElementById(`${prefix}Prompt`); if(prompt) prompt.classList.remove('hidden');
+            const actions = document.getElementById(`${prefix}ImageActions`); if(actions) actions.classList.add('hidden');
         };
 
-        // EVENT HANDLERS
+        window.adminComment = async (e, nlId) => {
+            e.preventDefault(); const input = e.target.querySelector('input'); if(!input.value) return;
+            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'newsletter_comments'), {
+                newsletterId: nlId, authorName: "POPETOWN OFFICIAL", text: input.value, timestamp: serverTimestamp(), isAdmin: true
+            }); input.value = ""; toast("REPLY_SENT"); } catch(err) { toast("FAIL"); }
+        };
+
         document.getElementById('loginForm').onsubmit = async (e) => {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPass').value;
-            try { await signInWithEmailAndPassword(auth, email, pass); } 
-            catch(err) { toast("ACCESS_DENIED // INVALID_CIPHER"); }
+            try { await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPass').value); } 
+            catch(err) { toast("AUTH_FAILED"); }
         };
 
         document.getElementById('logoutBtn').onclick = () => { toggleInterface(false); signOut(auth); };
 
+        document.getElementById('newsletterForm').onsubmit = async (e) => {
+            e.preventDefault(); const btn = document.getElementById('nlBtn'), id = document.getElementById('editNewsletterId').value;
+            btn.disabled = true;
+            try {
+                const payload = { title: document.getElementById('nlTitle').value, content: document.getElementById('nlContent').value, imagePath: document.getElementById('nlImageData').value || "", timestamp: serverTimestamp() };
+                if(id) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'newsletter', id), payload);
+                else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'newsletter'), payload);
+                e.target.reset(); window.clearAsset('nl'); toast("SUCCESS");
+            } catch(err) { toast("FAIL"); } btn.disabled = false;
+        };
+
         document.getElementById('eventForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('evBtn'), id = document.getElementById('editEventId').value;
+            e.preventDefault(); const btn = document.getElementById('evBtn'), id = document.getElementById('editEventId').value;
             btn.disabled = true;
             try {
-                const payload = {
-                    title: document.getElementById('evTitle').value,
-                    date: Timestamp.fromDate(new Date(document.getElementById('evDate').value)),
-                    status: document.getElementById('evStatus').value,
-                    ticketLink: document.getElementById('evTicketLink').value || null,
-                    description: document.getElementById('evDesc').value,
-                    imagePath: document.getElementById('evImageData').value || "",
-                    timestamp: serverTimestamp()
-                };
-                if (id) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', id), payload);
+                const payload = { title: document.getElementById('evTitle').value, date: Timestamp.fromDate(new Date(document.getElementById('evDate').value)), status: document.getElementById('evStatus').value, ticketLink: document.getElementById('evTicketLink').value || null, description: document.getElementById('evDesc').value, imagePath: document.getElementById('evImageData').value || "", timestamp: serverTimestamp() };
+                if(id) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', id), payload);
                 else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'events'), payload);
-                document.getElementById('evCancelBtn').click();
-                toast("SYNC_SUCCESS");
-            } catch (err) { toast("SYNC_FAIL"); }
-            btn.disabled = false;
+                e.target.reset(); window.clearAsset('ev'); toast("SUCCESS");
+            } catch(err) { toast("FAIL"); } btn.disabled = false;
         };
 
-        window.editNode = (id) => {
-            const i = masterData.events.find(e => e.id === id);
-            if (!i) return;
-            document.getElementById('editEventId').value = id;
-            document.getElementById('evTitle').value = i.title;
-            document.getElementById('evStatus').value = i.status;
-            document.getElementById('evTicketLink').value = i.ticketLink || '';
-            document.getElementById('evDesc').value = i.description || '';
-            if (i.date) document.getElementById('evDate').value = i.date.toDate().toISOString().split('T')[0];
-            if (i.imagePath) {
-                document.getElementById('evPreview').src = i.imagePath;
-                document.getElementById('evPreview').classList.remove('hidden');
-                document.getElementById('evPrompt').classList.add('hidden');
-                document.getElementById('evImageActions').classList.remove('hidden');
-                document.getElementById('evImageData').value = i.imagePath;
-            }
-            document.getElementById('evCancelBtn').classList.remove('hidden');
-            window.scrollTo({ top: document.getElementById('eventSection').offsetTop - 120, behavior: 'smooth' });
-        };
+        window.purgeNode = async (c, id) => { if (confirm("PURGE NODE?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', c, id)); };
 
-        document.getElementById('evCancelBtn').onclick = () => {
-            document.getElementById('eventForm').reset();
-            document.getElementById('editEventId').value = "";
-            window.clearAsset('ev');
-            document.getElementById('evCancelBtn').classList.add('hidden');
-        };
-
-        window.purgeNode = async (c, id) => {
-            if (!confirm("PERMANENTLY TERMINATE NODE?")) return;
-            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', c, id)); toast("NODE_PURGED"); }
-            catch (e) { toast("PURGE_REJECTED"); }
-        };
-
-        window.flagNode = async (id, s) => {
-            try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'inquiries', id), { flagged: s }); }
-            catch (e) { toast("FLAG_FAIL"); }
-        };
-
-        // MEDIA GALLERY UPLOAD
-        document.getElementById('mediaGalleryForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('mgBtn');
-            btn.disabled = true;
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'media_gallery'), {
-                    title: document.getElementById('mgTitle').value,
-                    type: document.getElementById('mgType').value,
-                    category: document.getElementById('mgCategory').value,
-                    url: document.getElementById('mgImageData').value,
-                    timestamp: serverTimestamp()
-                });
-                toast("MEDIA_SYNC_STABLE");
-                e.target.reset();
-                window.clearAsset('mg');
-            } catch (err) { toast("BROADCAST_FAIL"); }
-            btn.disabled = false;
-        };
-
-        // UPLOADER LOGIC
         const setupUploader = (inputId, prevId, vidPrevId, dataId, promptId, actionsId, cId, bId) => {
-            document.getElementById(inputId).onchange = async (e) => {
+            const input = document.getElementById(inputId); if(!input) return;
+            input.onchange = async (e) => {
                 const f = e.target.files[0]; if (!f) return;
                 try {
                     const url = await uploadFile(f, document.getElementById(bId), document.getElementById(cId));
                     document.getElementById(dataId).value = url;
                     document.getElementById(promptId).classList.add('hidden');
                     document.getElementById(actionsId).classList.remove('hidden');
-                    
                     if (f.type.startsWith('video/')) {
-                        if(vidPrevId) {
-                            const v = document.getElementById(vidPrevId);
-                            v.src = url; v.classList.remove('hidden'); v.play();
-                            if(prevId) document.getElementById(prevId).classList.add('hidden');
-                        }
-                    } else {
-                        if(prevId) {
-                            const i = document.getElementById(prevId);
-                            i.src = url; i.classList.remove('hidden');
-                            if(vidPrevId) document.getElementById(vidPrevId).classList.add('hidden');
-                        }
-                    }
-                } catch (err) { toast("UPLINK_ABORTED"); }
+                        if(vidPrevId) { const v = document.getElementById(vidPrevId); v.src = url; v.classList.remove('hidden'); v.play(); }
+                    } else if(prevId) { const i = document.getElementById(prevId); i.src = url; i.classList.remove('hidden'); }
+                } catch (err) { toast("UPLOAD_FAIL"); }
             };
         };
 
         setupUploader('evFile', 'evPreview', null, 'evImageData', 'evPrompt', 'evImageActions', 'evProgressContainer', 'evProgressBar');
-        setupUploader('galFile', 'galPreview', null, 'galImageData', 'galPrompt', 'galImageActions', 'galProgressContainer', 'galProgressBar');
+        setupUploader('nlFile', 'nlPreview', null, 'nlImageData', 'nlPrompt', 'nlImageActions', 'nlProgressContainer', 'nlProgressBar');
         setupUploader('mgFile', 'mgPreview', 'mgVideoPreview', 'mgImageData', 'mgPrompt', 'mgImageActions', 'mgProgressContainer', 'mgProgressBar');
-
-        document.getElementById('galleryForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('galBtn'); btn.disabled = true;
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'gallery'), {
-                    title: document.getElementById('galTitle').value,
-                    logId: document.getElementById('galLog').value,
-                    imageURL: document.getElementById('galImageData').value,
-                    timestamp: serverTimestamp()
-                });
-                toast("ARCHIVE_COMMITTED");
-                e.target.reset();
-                window.clearAsset('gal');
-            } catch (err) { toast("SYNC_FAIL"); }
-            btn.disabled = false;
-        };
+        setupUploader('galFile', 'galPreview', null, 'galImageData', 'galPrompt', 'galImageActions', 'galProgressContainer', 'galProgressBar');
 
         function initThree() {
-            const container = document.getElementById('canvas-container');
-            if (!container || container.innerHTML !== "") return;
+            const container = document.getElementById('canvas-container'); if (!container || container.innerHTML !== "") return;
             const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000), ren = new THREE.WebGLRenderer({ alpha: true, antialias: true });
             ren.setSize(window.innerWidth, window.innerHeight); container.appendChild(ren.domElement);
-            const pts = []; for (let i=0; i<2500; i++) pts.push(THREE.MathUtils.randFloatSpread(50), THREE.MathUtils.randFloatSpread(50), THREE.MathUtils.randFloatSpread(50));
-            const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-            const mat = new THREE.PointsMaterial({ color: 0xff0000, size: 0.05, transparent: true, opacity: 0.3 });
-            const cloud = new THREE.Points(geo, mat); scene.add(cloud); cam.position.z = 15;
-            function anim() { requestAnimationFrame(anim); cloud.rotation.y += 0.0004; ren.render(scene, cam); }
-            anim();
+            const geo = new THREE.BufferGeometry(), pts = []; for(let i=0; i<3000; i++) pts.push(THREE.MathUtils.randFloatSpread(50), THREE.MathUtils.randFloatSpread(50), THREE.MathUtils.randFloatSpread(50));
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+            const cloud = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xff0000, size: 0.05, transparent: true, opacity: 0.3 }));
+            scene.add(cloud); cam.position.z = 20;
+            function anim() { requestAnimationFrame(anim); cloud.rotation.y += 0.0004; ren.render(scene, cam); } anim();
         }
 
         window.onload = async () => {
@@ -769,17 +486,19 @@
             try {
                 if (initialToken) await signInWithCustomToken(auth, initialToken);
                 else await signInAnonymously(auth);
-                stat.innerText = "Link Stable // Staff Credentials Required";
-            } catch (err) { stat.innerText = "Grid Link Failure"; }
+                if(stat) stat.innerText = "Link Stable // Staff Required";
+            } catch (err) { if(stat) stat.innerText = "Failure"; }
             
             onAuthStateChanged(auth, (user) => {
                 if (user && !user.isAnonymous) toggleInterface(true);
                 else toggleInterface(false);
             });
             if (window.lucide) lucide.createIcons();
+            
+            // Re-bind search with null-checks
+            const search = document.getElementById('globalSearch');
+            if(search) search.oninput = () => { renderEvents(); renderMediaGallery(); renderNewsletter(); };
         };
-
-        document.getElementById('globalSearch').oninput = () => { renderEvents(); renderSignals(); renderArchive(); renderMediaGallery(); };
     </script>
 </body>
 </html>

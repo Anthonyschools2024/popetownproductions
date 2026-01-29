@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POPETOWN Productions | Elite Events & Music Education</title>
-    <!-- Dependencies -->
+    <!-- CSS Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --brand-red: #ff0000; --bg-black: #050505; }
         body { background-color: var(--bg-black); color: #ffffff; font-family: 'Inter', sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
         h1, h2, h3, .nav-item { font-family: 'Orbitron', sans-serif; }
         
+        /* Persistent Navigation Fix */
         #mainNav {
             position: fixed !important;
             top: 0 !important;
@@ -34,57 +35,67 @@
             background: var(--brand-red); color: white; padding: 12px 28px; 
             text-transform: uppercase; font-weight: 700; letter-spacing: 2px; 
             transition: 0.3s; cursor: pointer; border: none; display: inline-block;
-            text-decoration: none; text-align: center;
         }
         .btn-red:hover { box-shadow: 0 0 25px rgba(255, 0, 0, 0.7); transform: translateY(-2px); }
+        .btn-red:disabled { opacity: 0.5; cursor: wait; }
 
         .nav-link { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; color: white; text-decoration: none; }
         .nav-link:hover { color: var(--brand-red); }
 
-        .event-card { 
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            overflow: hidden;
-            backface-visibility: hidden;
-            transform: translateZ(0);
-        }
-        .event-card:hover { transform: translateY(-10px) translateZ(0); border-color: var(--brand-red); }
-
-        .high-res-img {
-            opacity: 0;
-            transition: opacity 0.8s ease-in-out;
-            will-change: opacity;
-        }
-        .high-res-img.loaded { opacity: 0.9; }
-
         .calendar-day { min-height: 85px; border: 1px solid rgba(255, 255, 255, 0.05); transition: 0.2s ease; }
         .calendar-day.has-event { border-left: 3px solid var(--brand-red); background: rgba(255, 0, 0, 0.02); }
+        .calendar-day.today { background: rgba(255, 255, 255, 0.05); }
         .event-dot { width: 6px; height: 6px; background: var(--brand-red); border-radius: 50%; display: inline-block; box-shadow: 0 0 8px var(--brand-red); }
 
         #mobileMenu { 
             position: fixed; top: 80px; left: 0; width: 100%; height: calc(100vh - 80px);
             background: black; z-index: 9998; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; gap: 2rem;
+            justify-content: center; align-items: center; gap: 3rem;
             transform: translateX(100%); transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         #mobileMenu.open { transform: translateX(0); }
 
-        .footer-icon { width: 24px; height: 24px; fill: currentColor; transition: 0.3s; }
-        .footer-link:hover .footer-icon { filter: drop-shadow(0 0 8px var(--brand-red)); transform: scale(1.15); color: var(--brand-red); }
-
+        .event-card { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden; }
+        .event-card:hover { transform: translateY(-10px); border-color: var(--brand-red); }
+        
         .gallery-track::-webkit-scrollbar { display: none; }
         .gallery-track { -ms-overflow-style: none; scrollbar-width: none; }
 
+        input, textarea, select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 0.85rem; outline: none; width: 100%; transition: border 0.3s; }
+        input:focus { border-color: var(--brand-red); }
+
         #canvas-container { position: fixed; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; }
         section { scroll-margin-top: 100px; }
-        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+
+        /* High Quality Image Rendering Optimization */
+        .high-res-img {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            will-change: opacity;
+        }
+        .high-res-img.loaded {
+            opacity: 0.85;
+        }
+        .event-card:hover .high-res-img.loaded {
+            opacity: 1;
+        }
+
+        .footer-icon { width: 24px; height: 24px; fill: currentColor; transition: 0.3s; }
+        .footer-link:hover .footer-icon { filter: drop-shadow(0 0 8px var(--brand-red)); transform: scale(1.15); color: var(--brand-red); }
     </style>
 </head>
 <body>
 
     <div id="canvas-container"></div>
 
-    <!-- Persistent Navigation -->
+    <!-- MAIN NAVIGATION -->
     <nav id="mainNav">
         <div class="max-w-7xl mx-auto w-full px-6 flex justify-between items-center text-left">
             <div class="flex items-center gap-12">
@@ -92,62 +103,72 @@
                     POPETOWN <span class="neon-accent">PRODUCTIONS</span>
                 </div>
                 
+                <!-- Desktop Links -->
                 <div class="hidden md:flex items-center gap-8 border-l border-white/10 pl-8">
                     <a href="#events" class="nav-link">Events</a>
-                    <a href="gallery.html" class="nav-link">Media Gallery</a>
+                    <a href="gallery.html" class="nav-link">Gallery</a>
+                    <a href="newsletter.html" class="nav-link">Newsletter</a>
                     <a href="#lessons" class="nav-link">Music School</a>
                     <a href="#contact" class="nav-link">Contact</a>
                 </div>
             </div>
 
             <div class="flex items-center gap-4">
-                <a href="admin.html" class="hidden md:block text-[10px] font-bold text-zinc-500 hover:text-red-500 uppercase tracking-widest transition-colors">Staff Login</a>
+                <a href="admin.html" class="hidden md:block text-[10px] font-bold text-zinc-500 hover:text-red-500 uppercase tracking-widest transition-colors">
+                    Staff Login
+                </a>
+                
                 <button id="menuToggle" class="md:hidden p-2 text-white border border-red-600/30 rounded bg-red-600/5">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    <svg id="menuIcon" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
                 </button>
             </div>
         </div>
     </nav>
 
-    <!-- Mobile Navigation -->
+    <!-- MOBILE NAVIGATION OVERLAY -->
     <div id="mobileMenu">
-        <a href="#events" class="mobile-link text-2xl font-bold uppercase tracking-widest text-white no-underline">Events</a>
-        <a href="gallery.html" class="mobile-link text-2xl font-bold uppercase tracking-widest text-white no-underline">Media Gallery</a>
-        <a href="#lessons" class="mobile-link text-2xl font-bold uppercase tracking-widest text-white no-underline">Music School</a>
-        <a href="#contact" class="mobile-link text-2xl font-bold uppercase tracking-widest text-white no-underline">Contact</a>
-        <a href="admin.html" class="mt-4 border border-red-600 px-8 py-3 text-red-600 uppercase font-bold text-sm tracking-widest no-underline">Staff Login</a>
+        <a href="#events" class="mobile-link text-3xl font-bold uppercase tracking-widest text-white no-underline">Events</a>
+        <a href="gallery.html" class="mobile-link text-3xl font-bold uppercase tracking-widest text-white no-underline">Gallery</a>
+        <a href="newsletter.html" class="mobile-link text-3xl font-bold uppercase tracking-widest text-white no-underline">Newsletter</a>
+        <a href="#lessons" class="mobile-link text-3xl font-bold uppercase tracking-widest text-white no-underline">Music School</a>
+        <a href="#contact" class="mobile-link text-3xl font-bold uppercase tracking-widest text-white no-underline">Contact</a>
+        <a href="admin.html" class="mt-8 border border-red-600 px-10 py-4 text-red-600 uppercase font-black tracking-widest no-underline">Staff Access</a>
     </div>
 
+    <!-- PAGE CONTENT -->
     <main>
-        <!-- Hero -->
+        <!-- HERO SECTION -->
         <section class="h-screen flex flex-col justify-center items-center text-center px-4">
             <div class="z-10">
                 <p class="text-red-500 tracking-[0.6em] mb-4 text-[10px] uppercase font-bold animate-pulse">Premier Event Production</p>
                 <h1 class="text-5xl md:text-8xl font-black mb-6 tracking-tighter uppercase leading-tight italic">EXPERIENCE THE<br><span class="neon-accent">LIVE PRODUCTION</span></h1>
                 <p class="text-base md:text-xl text-zinc-400 max-w-2xl mx-auto mb-12 tracking-widest uppercase font-light">POPETOWN PRODUCTIONS // EST. 2026</p>
                 <div class="flex flex-col md:flex-row gap-6 justify-center">
-                    <a href="#events" class="btn-red px-12">Upcoming Events</a>
-                    <a href="gallery.html" class="btn-red !bg-transparent border border-white px-12">Media Gallery</a>
+                    <a href="#events" class="btn-red px-12 no-underline">Upcoming Events</a>
+                    <a href="gallery.html" class="btn-red !bg-transparent border border-white px-12 no-underline">Visual Gallery</a>
                 </div>
             </div>
         </section>
 
-        <!-- Events Grid -->
+        <!-- LIVE EVENTS SECTION -->
         <section id="events" class="py-24 px-6 max-w-7xl mx-auto text-left">
             <div class="mb-20">
-                <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white italic">POPETOWN <span class="text-red-600">EVENTS</span></h2>
+                <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white italic text-left">POPETOWN <span class="text-red-600">EVENTS</span></h2>
                 <div class="h-1 w-24 bg-red-600 mt-6 mb-8 shadow-[0_0_15px_red]"></div>
                 <p class="text-zinc-500 uppercase text-xs tracking-[0.3em]">Engineering high-fidelity musical experiences.</p>
             </div>
 
+            <!-- Dynamic Grid -->
             <div id="eventCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                <div class="col-span-full py-24 text-center opacity-20 text-xs uppercase tracking-[1em]">Establishing_Neural_Sync...</div>
+                <div class="col-span-full py-24 text-center opacity-20 text-xs uppercase tracking-[1em]">Scanning_Neural_Feed...</div>
             </div>
 
-            <!-- Calendar -->
+            <!-- CALENDAR -->
             <div class="glass-panel p-8 mt-24">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
-                    <h3 class="text-xl font-bold uppercase tracking-widest text-red-600">Production Grid</h3>
+                    <h3 class="text-xl font-bold uppercase tracking-widest text-red-600">Production Calendar</h3>
                     <div class="flex items-center space-x-10">
                         <button id="prevMonth" class="text-white text-2xl hover:text-red-600 transition">&larr;</button>
                         <span id="currentMonthYear" class="text-sm font-bold uppercase tracking-widest min-w-[150px] text-center text-white"></span>
@@ -160,8 +181,8 @@
                 <div id="calendarGrid" class="grid grid-cols-7 gap-px border border-white/5 bg-white/5"></div>
             </div>
 
-            <!-- Visual Archive Carousel -->
-            <div class="glass-panel p-8 mt-12">
+            <!-- VISUAL ARCHIVE CAROUSEL -->
+            <div class="glass-panel p-8 mt-12 text-left">
                 <div class="flex justify-between items-center mb-8">
                     <h3 class="text-xl font-bold uppercase tracking-widest text-white">Visual <span class="text-red-600">Archive</span></h3>
                     <div class="flex space-x-4">
@@ -169,8 +190,8 @@
                         <button id="scrollRight" class="border border-white/10 p-3 hover:border-red-600 transition rounded-full text-white">&rarr;</button>
                     </div>
                 </div>
-                <div id="galleryTrack" class="gallery-track flex space-x-8 overflow-x-auto scroll-smooth pb-6">
-                    <div class="min-w-full text-center py-10 opacity-20 text-[10px] uppercase tracking-widest text-white">Archive_Offline</div>
+                <div id="galleryTrack" class="gallery-track flex space-x-8 overflow-x-auto scroll-smooth pb-6 text-left">
+                    <div class="min-w-full text-center py-10 opacity-20 text-[10px] uppercase tracking-widest font-black text-white">Archive_Stream_Offline</div>
                 </div>
                 <div class="mt-8 text-center border-t border-white/5 pt-8">
                     <a href="gallery.html" class="text-[10px] font-black uppercase text-red-600 tracking-[0.4em] hover:text-white transition-colors no-underline">:: Enter_The_Media_Core</a>
@@ -178,71 +199,71 @@
             </div>
         </section>
 
-        <!-- Music School -->
+        <!-- MUSIC SCHOOL SECTION -->
         <section id="lessons" class="py-32 bg-zinc-950/50 px-6 border-y border-white/5 text-left">
             <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
                 <div>
                     <h2 class="text-3xl md:text-5xl font-black mb-8 uppercase tracking-tighter text-white italic">Music <span class="text-red-600">School</span></h2>
-                    <p class="text-zinc-400 text-lg mb-10 leading-relaxed font-light">Absolute mastery of piano and strings through high-fidelity private mentorship.</p>
+                    <p class="text-zinc-400 text-lg mb-10 leading-relaxed font-light">High-fidelity private instruction. We specialize in the absolute mastery of piano and select string performance.</p>
                     <div class="space-y-6">
                         <div class="p-6 glass-panel border-l-4 border-red-600">
                             <h4 class="font-bold text-white uppercase tracking-widest">Piano & Keyboards</h4>
-                            <p class="text-[10px] text-zinc-500 mt-2 uppercase font-black tracking-widest italic">Classical // Modern // Advanced Theory</p>
+                            <p class="text-[10px] text-zinc-500 mt-2 uppercase font-black tracking-widest italic">Theory // Classical // Modern</p>
                         </div>
                         <div class="p-6 glass-panel border-l-4 border-red-600">
-                            <h4 class="font-bold text-white uppercase tracking-widest">Master Strings</h4>
-                            <p class="text-[10px] text-zinc-500 mt-2 uppercase font-black tracking-widest italic">Guitar // Bass // Banjo // Performance</p>
+                            <h4 class="font-bold text-white uppercase tracking-widest">Strings (Guitar, Bass, Banjo)</h4>
+                            <p class="text-[10px] text-zinc-500 mt-2 uppercase font-black tracking-widest italic">Performance // Technique // Composition</p>
                         </div>
                     </div>
                 </div>
                 <div class="glass-panel p-12 text-center flex flex-col items-center">
                     <span class="text-7xl md:text-9xl font-black text-red-600 italic">1:1</span>
-                    <p class="text-xs uppercase text-zinc-500 tracking-[0.6em] mt-8 font-black">Private Enrollment</p>
+                    <p class="text-xs uppercase text-zinc-500 tracking-[0.6em] mt-8 font-black">Private Mentorship</p>
                     <div class="h-px w-24 bg-white/10 my-10"></div>
-                    <a href="#contact" class="btn-red w-full">Inquire For Enrollment</a>
+                    <a href="#contact" class="btn-red w-full no-underline text-center">Inquire For Enrollment</a>
                 </div>
             </div>
         </section>
 
-        <!-- Contact Form -->
+        <!-- CONTACT SECTION -->
         <section id="contact" class="py-32 px-6 max-w-4xl mx-auto text-left">
             <div class="glass-panel p-10 md:p-16">
                 <div class="text-center mb-12">
                     <h2 class="text-2xl md:text-3xl font-black uppercase tracking-[0.4em] mb-4 text-white">Signal <span class="text-red-600">Inquiry</span></h2>
-                    <p class="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Secure Neural Link to HQ</p>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Secure Uplink to HQ</p>
                 </div>
                 <form id="contactForm" class="space-y-8">
                     <div class="grid md:grid-cols-2 gap-8">
-                        <input type="text" id="formName" required placeholder="IDENTIFICATION (FULL NAME)">
-                        <input type="email" id="formEmail" required placeholder="UPLINK (EMAIL ADDRESS)">
+                        <input type="text" id="formName" required placeholder="Full Name">
+                        <input type="email" id="formEmail" required placeholder="Email Address">
                     </div>
                     <select id="formSubject">
-                        <option value="production">Event Production Signal</option>
-                        <option value="lessons">School Enrollment Request</option>
-                        <option value="other">General Transmission</option>
+                        <option value="booking">Event Production / Production Signal</option>
+                        <option value="lessons">Music School Enrollment</option>
+                        <option value="other">General Inquiry</option>
                     </select>
-                    <textarea id="formMessage" required placeholder="DETAIL TRANSMISSION..." rows="5"></textarea>
-                    <button type="submit" id="formSubmit" class="btn-red w-full text-lg py-5 font-black">Send Transmission</button>
+                    <textarea id="formMessage" required placeholder="Detail your transmission..." rows="5"></textarea>
+                    <button type="submit" id="formSubmit" class="btn-red w-full text-lg py-5 font-black uppercase tracking-widest">Send Transmission</button>
                 </form>
                 <div id="formStatus" class="mt-8 text-center text-[11px] uppercase font-black hidden"></div>
             </div>
         </section>
     </main>
 
-    <!-- Footer with Socials -->
+    <!-- FOOTER -->
     <footer class="py-20 border-t border-white/5 text-center px-6">
         <p class="text-[10px] tracking-[0.4em] text-zinc-600 uppercase mb-12 font-black italic">&copy; 2026 POPETOWN PRODUCTIONS // GLOBAL MEDIA CORE</p>
         
         <div class="flex flex-wrap justify-center items-center gap-6 md:gap-10">
-            <!-- IG -->
+            <!-- Instagram -->
             <a href="https://www.instagram.com/j0ystick9official?igsh=cXZqazJuM2ZkMG40&utm_source=qr" target="_blank" class="footer-link text-zinc-600 hover:text-red-500 transition-colors">
                 <svg class="footer-icon" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.919-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
             </a>
-            <!-- TT -->
+            <!-- TikTok -->
             <a href="https://www.tiktok.com/@j0ystick9?_r=1&_t=ZP-92pUAYX8D3W" target="_blank" class="footer-link text-zinc-600 hover:text-red-500 transition-colors">
                 <svg class="footer-icon" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.9-.32-1.98-.23-2.81.33-.85.51-1.44 1.43-1.58 2.41-.02.16-.03.32-.03.48s.01.32.03.48c.17 1.08.88 2.01 1.85 2.52.58.31 1.21.46 1.87.46.66 0 1.29-.15 1.87-.46 1-.51 1.71-1.44 1.88-2.52.02-.16.03-.32.03-.48V.02z"/></svg>
             </a>
-            <!-- YT -->
+            <!-- YouTube -->
             <a href="https://youtube.com/@j0ystick9_music?si=pd405mhRrXAvdZRR" target="_blank" class="footer-link text-zinc-600 hover:text-red-500 transition-colors">
                 <svg class="footer-icon" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
             </a>
@@ -250,15 +271,15 @@
             <a href="https://open.spotify.com/artist/6UeEKUyVqpykFrZ2GDW94h?si=7Rw6Z9J5TYe0EW3p4LWFQQ" target="_blank" class="footer-link text-zinc-600 hover:text-red-500 transition-colors">
                 <svg class="footer-icon" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.485 17.308c-.215.352-.676.463-1.028.249-2.82-1.722-6.37-2.111-10.548-1.157-.404.093-.808-.16-.901-.564-.093-.404.16-.808.564-.901 4.57-1.044 8.49-.593 11.664 1.345.352.215.463.676.249 1.028zm1.464-3.262c-.271.442-.846.582-1.288.311-3.228-1.984-8.15-2.559-11.966-1.401-.497.151-1.023-.131-1.174-.628-.151-.497.131-1.023.628-1.174 4.364-1.324 9.79-.675 13.5 1.605.442.271.582.846.311 1.288zm.126-3.418C14.887 7.771 8.01 7.544 4.053 8.745c-.615.186-1.265-.164-1.451-.779-.186-.615.164-1.265.779-1.451 4.542-1.378 12.112-1.104 16.924 1.751.553.328.738 1.036.41 1.589-.328.553-1.036.738-1.589.41z"/></svg>
             </a>
-            <!-- Apple -->
+            <!-- Apple Music -->
             <a href="https://music.apple.com/us/artist/j0ystick9/1716224733" target="_blank" class="footer-link text-zinc-600 hover:text-red-500 transition-colors">
                 <svg class="footer-icon" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm4.5 15.5c0 1.93-1.57 3.5-3.5 3.5s-3.5-1.57-3.5-3.5 1.57-3.5 3.5-3.5v-4.5l5-1v10.5z"/></svg>
             </a>
-            <!-- SC -->
+            <!-- SoundCloud -->
             <a href="https://on.soundcloud.com/xzylllVUEpTlstGKPZ" target="_blank" class="footer-link text-zinc-600 hover:text-red-500 transition-colors">
                 <svg class="footer-icon" viewBox="0 0 24 24"><path d="M11.56 16.5h10.4c1.13 0 2.04-.91 2.04-2.04 0-1.13-.91-2.04-2.04-2.04-.13 0-.25.01-.38.04C20.93 9.61 18.49 7.5 15.56 7.5c-1.3 0-2.48.42-3.45 1.13-.19-.4-.36-.82-.55-1.23-.19.41-.36.83-.55 1.23C10.04 7.92 8.86 7.5 7.56 7.5a4.56 4.56 0 0 0-4.05 2.5c-.17-.03-.35-.05-.53-.05-1.63 0-2.95 1.32-2.95 2.95s1.32 2.95 2.95 2.95h1.22c.11.23.23.45.36.66l.36-.66h7.19z"/></svg>
             </a>
-            <!-- Amazon -->
+            <!-- Amazon Music -->
             <a href="https://music.amazon.com/artists/B0CN5MHTY3/j0ystick9?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_x8a6ZEkr9DBEwYLG1STBu3Xyc" target="_blank" class="footer-link text-zinc-600 hover:text-red-500 transition-colors">
                 <svg class="footer-icon" viewBox="0 0 24 24"><path d="M14.545 17.5c-3.15 0-5.5-1.2-5.5-4.5 0-3 2.5-4.5 5.5-4.5.85 0 1.65.1 2.45.25v-.5c0-1.25-.75-2-2.25-2-1.35 0-2.55.45-3.55 1.2L10 5.25C11.3 4.15 13.2 3.5 15.2 3.5c3 0 5 1.5 5 5v7.5c0 1.2.2 1.8.6 2.2V19c-.65-.1-1.35-.25-2.05-.25-.9 0-1.45.45-1.85 1.25-1.15.95-2.7 1.5-4.45 1.5-2.6 0-4.45-1.3-4.45-3.5 0-2.05 1.6-3.25 4-3.25.7 0 1.45.1 2 .25v-.75c0-.65-.45-1-1.25-1-.75 0-1.45.25-2.05.75L9 16.5c1.1-1 2.7-1.5 4.35-1.5 2.5 0 4 1.25 4 3.5V19c-.8-.85-1.85-1.5-2.805-1.5zm.905-2.5c-.45-.1-.95-.15-1.45-.15-1.2 0-1.95.5-1.95 1.5 0 .9.75 1.4 1.7 1.4 1 0 1.7-.55 1.7-1.5v-1.25z"/></svg>
             </a>
@@ -269,11 +290,13 @@
         </div>
     </footer>
 
+    <!-- SYSTEM MODULES -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
+        // Global Sync Vars
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'popetown-productions-llc';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyCJv9cd_QhzNiwC2_nDd4LwnMANhBOsET8",
@@ -281,7 +304,8 @@
             projectId: "popetown-productions-llc",
             storageBucket: "popetown-productions-llc.firebasestorage.app",
             messagingSenderId: "436709069476",
-            appId: "1:436709069476:web:bbc0fcbe160b71fabccc31"
+            appId: "1:436709069476:web:bbc0fcbe160b71fabccc31",
+            measurementId: "G-B65Z56PYTR"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -291,7 +315,12 @@
         let unsubscribeEvents = null;
         let unsubscribeGallery = null;
 
-        window.onImgLoad = (el) => el.classList.add('loaded');
+        // Optimized Image Decoder
+        window.onImgLoad = (el) => {
+            el.classList.add('loaded');
+        };
+
+        // Retry helper for broken images (fallback if CORS fails)
         window.handleImgError = (el) => {
             if (el.hasAttribute('crossorigin')) {
                 el.removeAttribute('crossorigin');
@@ -299,6 +328,7 @@
             }
         };
 
+        // AUTH LOCK PROTOCOL
         const performAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
@@ -309,6 +339,7 @@
         window.onload = async () => {
             initThree();
             initUI();
+            
             await performAuth();
             onAuthStateChanged(auth, (u) => {
                 user = u;
@@ -321,7 +352,7 @@
             if (unsubscribeEvents) unsubscribeEvents();
             if (unsubscribeGallery) unsubscribeGallery();
 
-            // Compliance Path Rule 1
+            // Sync Events
             const evRef = collection(db, "artifacts", appId, "public", "data", "events");
             unsubscribeEvents = onSnapshot(evRef, (snap) => {
                 const evs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -329,61 +360,67 @@
                 updateCalendar(evs);
             });
 
+            // Sync Home Archive
             const galRef = collection(db, "artifacts", appId, "public", "data", "gallery");
             unsubscribeGallery = onSnapshot(galRef, (snap) => {
                 const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderGallery(items);
             });
 
-            document.getElementById('contactForm').onsubmit = async (e) => {
-                e.preventDefault();
-                const btn = document.getElementById('formSubmit'), stat = document.getElementById('formStatus');
-                btn.disabled = true; btn.innerText = "TRANSMITTING...";
-                try {
-                    await addDoc(collection(db, "artifacts", appId, "public", "data", "inquiries"), {
-                        fullName: document.getElementById('formName').value,
-                        email: document.getElementById('formEmail').value,
-                        subject: document.getElementById('formSubject').value,
-                        message: document.getElementById('formMessage').value,
-                        timestamp: serverTimestamp()
-                    });
-                    stat.innerText = "TRANSMISSION_COMPLETE // LOGGED_IN_CORE";
-                    stat.className = "mt-4 text-center text-[10px] uppercase text-green-500 block";
-                    e.target.reset();
-                } catch(e) {
-                    stat.innerText = "SIGNAL_INTERRUPTED";
-                    stat.className = "mt-4 text-center text-[10px] uppercase text-red-500 block";
-                }
-                btn.disabled = false; btn.innerText = "Send Transmission";
-                stat.classList.remove('hidden');
-                setTimeout(() => stat.classList.add('hidden'), 6000);
-            };
+            // Contact Form
+            const form = document.getElementById('contactForm');
+            if (form) {
+                form.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const btn = document.getElementById('formSubmit'), stat = document.getElementById('formStatus');
+                    btn.disabled = true; btn.innerText = "TRANSMITTING...";
+                    try {
+                        await addDoc(collection(db, "artifacts", appId, "public", "data", "inquiries"), {
+                            fullName: document.getElementById('formName').value,
+                            email: document.getElementById('formEmail').value,
+                            subject: document.getElementById('formSubject').value,
+                            message: document.getElementById('formMessage').value,
+                            timestamp: serverTimestamp()
+                        });
+                        stat.innerText = "TRANSMISSION_COMPLETE // LOGGED_IN_CORE";
+                        stat.className = "mt-4 text-center text-[10px] uppercase text-green-500 block";
+                        e.target.reset();
+                    } catch(e) {
+                        stat.innerText = "SIGNAL_INTERRUPTED";
+                        stat.className = "mt-4 text-center text-[10px] uppercase text-red-500 block";
+                    }
+                    btn.disabled = false; btn.innerText = "Send Transmission";
+                    stat.classList.remove('hidden');
+                    setTimeout(() => stat.classList.add('hidden'), 6000);
+                };
+            }
         }
 
         function renderEvents(evs) {
             const grid = document.getElementById('eventCardsGrid');
+            if(!grid) return;
             if(!evs || evs.length === 0) {
-                grid.innerHTML = '<div class="col-span-full py-24 text-center opacity-30 text-xs uppercase tracking-[1em] text-white">No active deployments</div>';
+                grid.innerHTML = '<div class="col-span-full py-24 text-center opacity-30 text-xs uppercase tracking-[1em] font-black text-white">No active deployments</div>';
                 return;
             }
             const sorted = [...evs].sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
             grid.innerHTML = sorted.map(ev => {
                 const ticketAction = ev.ticketLink 
-                    ? `<a href="${ev.ticketLink}" target="_blank" class="mt-8 text-[10px] font-black uppercase border-b-2 border-red-600 pb-1 hover:text-red-500 transition-all text-white no-underline inline-block">Acquire Access</a>`
-                    : `<span class="mt-8 text-[10px] font-black uppercase border-b-2 border-zinc-700 pb-1 text-zinc-500 cursor-default inline-block">Access Pending</span>`;
+                    ? `<a href="${ev.ticketLink}" target="_blank" rel="noopener noreferrer" class="mt-8 text-[10px] font-black uppercase border-b-2 border-red-600 pb-1 hover:text-red-500 transition-all tracking-[0.2em] text-white inline-block no-underline">Acquire Access</a>`
+                    : `<span class="mt-8 text-[10px] font-black uppercase border-b-2 border-zinc-700 pb-1 text-zinc-500 tracking-[0.2em] inline-block cursor-default">Access Pending</span>`;
 
                 return `
-                    <div class="event-card glass-panel flex flex-col h-full text-left">
+                    <div class="event-card glass-panel flex flex-col h-full">
                         <div class="h-64 bg-zinc-900 flex items-center justify-center relative overflow-hidden flex-shrink-0">
                             ${ev.imagePath ? `<img src="${ev.imagePath}" crossorigin="anonymous" onerror="handleImgError(this)" loading="lazy" onload="onImgLoad(this)" class="high-res-img absolute inset-0 w-full h-full object-cover">` : `<div class="text-zinc-800 text-6xl font-black uppercase italic">LIVE</div>`}
                             <div class="absolute inset-0 bg-red-600/10 pointer-events-none"></div>
-                            <div class="absolute top-4 right-4 bg-red-600 text-white text-[9px] font-black px-4 py-1.5 uppercase z-10">${ev.status || 'Upcoming'}</div>
+                            <div class="absolute top-4 right-4 bg-red-600 text-white text-[9px] font-black px-4 py-1.5 uppercase shadow-xl z-10">${ev.status || 'Upcoming'}</div>
                         </div>
-                        <div class="p-8 flex flex-col flex-grow">
-                            <span class="text-red-500 font-bold text-[10px] uppercase tracking-[0.3em]">${ev.date ? new Date(ev.date.seconds * 1000).toLocaleDateString() : 'TBA'}</span>
+                        <div class="p-8 flex flex-col flex-grow text-left">
+                            <span class="text-red-500 font-bold text-[10px] uppercase tracking-[0.3em]">${ev.date ? new Date(ev.date.seconds * 1000).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Date TBA'}</span>
                             <h3 class="text-xl font-bold mt-2 uppercase tracking-tighter text-white italic">${ev.title}</h3>
-                            <p class="text-zinc-400 text-sm mt-4 leading-relaxed line-clamp-3 font-light flex-grow">${ev.description || ''}</p>
-                            <div class="mt-auto">${ticketAction}</div>
+                            <p class="text-zinc-400 text-sm mt-4 leading-relaxed line-clamp-3 font-light flex-grow">${ev.description || 'Production briefing pending release.'}</p>
+                            <div class="mt-auto pt-6">${ticketAction}</div>
                         </div>
                     </div>
                 `;
@@ -434,27 +471,47 @@
 
         function initUI() {
             const t = document.getElementById('menuToggle'), m = document.getElementById('mobileMenu');
-            t.onclick = () => m.classList.toggle('open');
-            document.querySelectorAll('.mobile-link').forEach(l => l.onclick = () => m.classList.remove('open'));
+            if(t && m) {
+                t.onclick = () => m.classList.toggle('open');
+                document.querySelectorAll('.mobile-link').forEach(l => l.onclick = () => m.classList.remove('open'));
+            }
             const tr = document.getElementById('galleryTrack');
-            document.getElementById('scrollLeft').onclick = () => tr.scrollBy({ left: -480, behavior: 'smooth' });
-            document.getElementById('scrollRight').onclick = () => tr.scrollBy({ left: 480, behavior: 'smooth' });
-            document.getElementById('prevMonth').onclick = () => { calDate.setMonth(calDate.getMonth()-1); startDataSync(); };
-            document.getElementById('nextMonth').onclick = () => { calDate.setMonth(calDate.getMonth()+1); startDataSync(); };
+            if(tr) {
+                document.getElementById('scrollLeft').onclick = () => tr.scrollBy({ left: -480, behavior: 'smooth' });
+                document.getElementById('scrollRight').onclick = () => tr.scrollBy({ left: 480, behavior: 'smooth' });
+            }
+            const pm = document.getElementById('prevMonth'), nm = document.getElementById('nextMonth');
+            if(pm && nm) {
+                pm.onclick = () => { calDate.setMonth(calDate.getMonth()-1); startDataSync(); };
+                nm.onclick = () => { calDate.setMonth(calDate.getMonth()+1); startDataSync(); };
+            }
         }
 
         function initThree() {
             const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000), ren = new THREE.WebGLRenderer({ alpha: true });
             ren.setSize(window.innerWidth, window.innerHeight);
-            document.getElementById('canvas-container').appendChild(ren.domElement);
-            const starGeo = new THREE.BufferGeometry(), pArr = new Float32Array(4500);
+            ren.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            const container = document.getElementById('canvas-container');
+            if (container) container.appendChild(ren.domElement);
+            
+            const starGeo = new THREE.BufferGeometry(), sCnt = 1500, pArr = new Float32Array(4500);
             for(let i=0; i<4500; i++) pArr[i] = (Math.random()-0.5)*30;
             starGeo.setAttribute('position', new THREE.BufferAttribute(pArr, 3));
             sc.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.005, color: 0xffffff, transparent: true, opacity: 0.5 })));
+            
             const cr = new THREE.Mesh(new THREE.IcosahedronGeometry(3, 1), new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true, opacity: 0.02, transparent: true }));
             sc.add(cr); cam.position.z = 8;
-            function anim() { requestAnimationFrame(anim); cr.rotation.y += 0.0003; ren.render(sc, cam); }
+            function anim() { 
+                requestAnimationFrame(anim); 
+                cr.rotation.y += 0.0003; 
+                ren.render(sc, cam); 
+            }
             anim();
+            window.addEventListener('resize', () => { 
+                cam.aspect=window.innerWidth/window.innerHeight; 
+                cam.updateProjectionMatrix(); 
+                ren.setSize(window.innerWidth, window.innerHeight); 
+            });
         }
     </script>
 </body>
