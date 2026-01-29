@@ -40,6 +40,9 @@
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.05);
             background: #000;
+            backface-visibility: hidden;
+            transform: translateZ(0);
+            cursor: pointer;
         }
 
         .media-card:hover {
@@ -53,9 +56,10 @@
             object-fit: cover;
             opacity: 0;
             transition: opacity 1s ease, transform 0.6s ease;
+            will-change: opacity;
         }
 
-        .media-asset.loaded { opacity: 0.7; }
+        .media-asset.loaded { opacity: 0.85; }
         .media-card:hover .media-asset.loaded { opacity: 1; transform: scale(1.05); }
 
         .neon-accent { color: var(--brand-red); text-shadow: 0 0 10px rgba(255, 0, 0, 0.8); }
@@ -89,6 +93,7 @@
             transform: translateY(10px);
             opacity: 0;
             transition: 0.4s;
+            text-align: left;
         }
 
         .media-card:hover .media-info {
@@ -124,9 +129,7 @@
 
     <!-- Lightbox -->
     <div id="lightbox" onclick="this.style.display='none'">
-        <div id="lightbox-content" class="max-w-6xl w-full h-full flex items-center justify-center">
-            <!-- Dynamic content -->
-        </div>
+        <div id="lightbox-content" class="max-w-6xl w-full h-full flex items-center justify-center"></div>
         <button class="absolute top-10 right-10 text-white hover:text-red-600 transition">
             <i data-lucide="x" class="w-10 h-10"></i>
         </button>
@@ -136,19 +139,19 @@
     <nav id="mainNav">
         <div class="max-w-7xl mx-auto w-full px-8 flex justify-between items-center">
             <div class="flex items-center gap-12">
-                <a href="index.html" class="text-xl md:text-2xl font-bold uppercase tracking-tighter italic text-white text-decoration-none">
+                <a href="index.html" class="text-xl md:text-2xl font-bold uppercase tracking-tighter italic text-white no-underline">
                     POPETOWN <span class="neon-accent">PRODUCTIONS</span>
                 </a>
                 <div class="hidden md:flex items-center gap-8 border-l border-white/10 pl-8">
-                    <a href="index.html" class="text-[10px] font-bold tracking-[0.2em] hover:text-red-500 transition-colors uppercase">Grid_Main</a>
-                    <a href="#" class="text-[10px] font-bold tracking-[0.2em] text-red-500 transition-colors uppercase">Media_Core</a>
+                    <a href="index.html" class="text-[10px] font-bold tracking-[0.2em] hover:text-red-500 transition-colors uppercase text-white no-underline">Grid_Main</a>
+                    <a href="#" class="text-[10px] font-bold tracking-[0.2em] text-red-500 transition-colors uppercase no-underline">Media_Core</a>
                 </div>
             </div>
-            <a href="index.html#contact" class="text-[10px] font-black uppercase border border-red-600 px-6 py-2 hover:bg-red-600 transition-all tracking-widest text-white">Contact_Uplink</a>
+            <a href="index.html#contact" class="text-[10px] font-black uppercase border border-red-600 px-6 py-2 hover:bg-red-600 transition-all tracking-widest text-white no-underline">Contact_Uplink</a>
         </div>
     </nav>
 
-    <!-- Header Section -->
+    <!-- Header -->
     <header class="pt-48 pb-20 px-8 max-w-7xl mx-auto text-left">
         <p class="text-red-600 font-black tracking-[0.5em] text-[10px] uppercase mb-4 animate-pulse">:: Visual Archive Database ::</p>
         <h1 class="text-6xl md:text-8xl font-black uppercase tracking-tighter italic leading-none mb-10">MEDIA<br><span class="neon-accent">GALLERY</span></h1>
@@ -162,28 +165,24 @@
 
     <!-- Gallery Grid -->
     <main class="px-8 pb-40 max-w-7xl mx-auto">
-        <div id="media-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Loading state shimmers -->
-            <div class="media-card glass-panel bg-zinc-900/20 animate-pulse"></div>
-            <div class="media-card glass-panel bg-zinc-900/20 animate-pulse"></div>
-            <div class="media-card glass-panel bg-zinc-900/20 animate-pulse"></div>
+        <div id="media-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+            <!-- Shimmer Loading -->
             <div class="media-card glass-panel bg-zinc-900/20 animate-pulse"></div>
             <div class="media-card glass-panel bg-zinc-900/20 animate-pulse"></div>
             <div class="media-card glass-panel bg-zinc-900/20 animate-pulse"></div>
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="py-20 border-t border-white/5 text-center px-8">
-        <p class="text-[9px] tracking-[0.4em] text-zinc-600 uppercase">&copy; 2026 POPETOWN MEDIA CORE // BROADCASTING WORLDWIDE</p>
+        <p class="text-[9px] tracking-[0.4em] text-zinc-600 uppercase mb-8">&copy; 2026 POPETOWN MEDIA CORE // BROADCASTING WORLDWIDE</p>
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // Global Platform Vars
+        // CONFIG
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'popetown-productions-llc';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyCJv9cd_QhzNiwC2_nDd4LwnMANhBOsET8",
@@ -201,28 +200,51 @@
         let allMedia = [];
         let currentFilter = 'all';
 
-        // Auth and Load
+        // Global decoder triggers
+        window.onAssetLoad = (el) => el.classList.add('loaded');
+
+        // CORS Fallback - Same as index.html for high-res assets
+        window.handleMediaError = (el) => {
+            if (el.hasAttribute('crossorigin')) {
+                el.removeAttribute('crossorigin');
+                const src = el.src || (el.querySelector('source') ? el.querySelector('source').src : '');
+                if (el.tagName === 'VIDEO') {
+                    el.load();
+                } else {
+                    el.src = src;
+                }
+            }
+        };
+
+        const performAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) { await signInAnonymously(auth); }
+        };
+
         window.onload = async () => {
             initThree();
-            try {
-                await signInAnonymously(auth);
-                const q = query(collection(db, "artifacts", appId, "public", "data", "media_gallery"), orderBy("timestamp", "desc"));
-                onSnapshot(q, (snap) => {
-                    allMedia = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                    renderGallery();
-                });
-            } catch (err) {
-                console.error("Neural uplink failed", err);
-            }
+            await performAuth();
+            
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    const q = query(collection(db, "artifacts", appId, "public", "data", "media_gallery"), orderBy("timestamp", "desc"));
+                    onSnapshot(q, (snap) => {
+                        allMedia = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                        renderGallery();
+                    });
+                }
+            });
             lucide.createIcons();
         };
 
         window.renderGallery = () => {
             const grid = document.getElementById('media-grid');
-            const filtered = allMedia.filter(m => {
-                if (currentFilter === 'all') return true;
-                return m.type === currentFilter;
-            });
+            const filtered = allMedia.filter(m => currentFilter === 'all' || m.type === currentFilter);
 
             if (filtered.length === 0) {
                 grid.innerHTML = `<div class="col-span-full py-40 text-center text-[10px] text-zinc-700 uppercase tracking-[1em]">Core_Memory_Empty</div>`;
@@ -230,39 +252,33 @@
             }
 
             grid.innerHTML = filtered.map(media => {
-                const isVideo = media.type === 'video' || media.url.match(/\.(mp4|webm|ogg)$/i);
+                const isVideo = media.type === 'video';
                 return `
                     <div class="media-card group glass-panel" onclick="openLightbox('${media.url}', ${isVideo})">
                         ${isVideo ? `
-                            <div class="video-indicator">
-                                <i data-lucide="play" class="w-3 h-3 text-white fill-white"></i>
-                            </div>
-                            <video class="media-asset" muted loop playsinline onplay="this.classList.add('loaded')">
+                            <div class="video-indicator"><i data-lucide="play" class="w-3 h-3 text-white fill-white"></i></div>
+                            <video class="media-asset" muted loop playsinline crossorigin="anonymous" onerror="handleMediaError(this)" onplay="onAssetLoad(this)">
                                 <source src="${media.url}" type="video/mp4">
                             </video>
                         ` : `
-                            <img src="${media.url}" class="media-asset" onload="this.classList.add('loaded')" loading="lazy">
+                            <img src="${media.url}" crossorigin="anonymous" onerror="handleMediaError(this)" class="media-asset" onload="onAssetLoad(this)" loading="lazy">
                         `}
-                        <div class="media-info">
+                        <div class="media-info text-left">
                             <p class="text-red-500 font-black text-[9px] uppercase tracking-[0.2em] mb-1">${media.category || 'Capture'}</p>
                             <h3 class="text-white text-sm font-bold uppercase tracking-widest">${media.title || 'Untitled_Capture'}</h3>
-                            <p class="text-zinc-500 text-[8px] mt-2 font-mono">${media.id.slice(0,12)}</p>
                         </div>
                     </div>
                 `;
             }).join('');
             
             lucide.createIcons();
-
-            // Trigger autoplay for videos visible in view
-            const videos = document.querySelectorAll('video');
-            videos.forEach(v => v.play().catch(() => {}));
+            // Start visible videos
+            document.querySelectorAll('video').forEach(v => v.play().catch(() => {}));
         };
 
         window.filterGallery = (type) => {
             currentFilter = type;
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`btn-${type}`).classList.add('active');
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.id === `btn-${type}`));
             renderGallery();
         };
 
@@ -270,11 +286,9 @@
             const lb = document.getElementById('lightbox');
             const content = document.getElementById('lightbox-content');
             lb.style.display = 'flex';
-            if (isVideo) {
-                content.innerHTML = `<video controls autoplay class="max-w-full max-h-full shadow-2xl border border-white/10"><source src="${url}" type="video/mp4"></video>`;
-            } else {
-                content.innerHTML = `<img src="${url}" class="max-w-full max-h-full object-contain shadow-2xl border border-white/10">`;
-            }
+            content.innerHTML = isVideo ? 
+                `<video controls autoplay class="max-w-full max-h-full border border-white/10 shadow-2xl"><source src="${url}" type="video/mp4"></video>` : 
+                `<img src="${url}" class="max-w-full max-h-full object-contain border border-white/10 shadow-2xl">`;
         };
 
         function initThree() {
@@ -282,16 +296,13 @@
             const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000), ren = new THREE.WebGLRenderer({ alpha: true });
             ren.setSize(window.innerWidth, window.innerHeight);
             container.appendChild(ren.domElement);
-            
             const geo = new THREE.BufferGeometry(), count = 1000, pos = new Float32Array(count*3);
             for(let i=0; i<count*3; i++) pos[i] = (Math.random()-0.5)*30;
             geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
             sc.add(new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.008, color: 0xff0000, transparent: true, opacity: 0.3 })));
-            
             cam.position.z = 12;
             function anim() { requestAnimationFrame(anim); sc.rotation.y += 0.0002; ren.render(sc, cam); }
             anim();
-            window.addEventListener('resize', () => { cam.aspect=window.innerWidth/window.innerHeight; cam.updateProjectionMatrix(); ren.setSize(window.innerWidth, window.innerHeight); });
         }
     </script>
 </body>

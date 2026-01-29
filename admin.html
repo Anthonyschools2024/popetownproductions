@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POPETOWN Admin | Command Center v4.1</title>
+    <title>POPETOWN Admin | Command Center v4.2</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Three.js -->
@@ -244,17 +244,17 @@
 
             <!-- PRODUCTION GRID -->
             <section id="eventSection" class="space-y-12">
-                <div class="flex justify-between items-end border-b border-white/5 pb-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/5 pb-8">
                     <div class="text-left">
                         <h2 class="text-2xl font-black uppercase tracking-widest text-white">Production <span class="text-red-600">Grid</span></h2>
                         <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2 italic text-left">Deploy and manage live event nodes and ticketing links</p>
                     </div>
-                    <div id="nodeStatus" class="text-[9px] font-mono bg-zinc-900 px-6 py-2 border border-white/5 text-zinc-500 uppercase tracking-widest">Network: Syncing...</div>
+                    <div id="nodeStatus" class="text-[9px] font-mono bg-zinc-900 px-6 py-2 border border-white/5 text-zinc-500 uppercase tracking-widest mt-4 md:mt-0">Network: Syncing...</div>
                 </div>
 
                 <div class="grid xl:grid-cols-3 gap-12 items-start">
-                    <!-- Form -->
-                    <div class="xl:col-span-1 glass-panel p-10 space-y-8 sticky top-36">
+                    <!-- Form Container - Fixed sticky behavior for mobile -->
+                    <div class="xl:col-span-1 glass-panel p-6 md:p-10 space-y-8 xl:sticky xl:top-36 z-40 bg-zinc-950">
                         <h3 class="text-sm font-black uppercase tracking-[0.3em] flex items-center gap-3">
                             <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span> Node Uplink
                         </h3>
@@ -305,7 +305,7 @@
                         </form>
                     </div>
 
-                    <!-- List -->
+                    <!-- Event List Container - Now naturally follows on mobile -->
                     <div class="xl:col-span-2 space-y-6">
                         <div id="eventList" class="grid gap-6">
                             <div class="py-20 text-center text-[10px] text-zinc-800 uppercase tracking-[1em] animate-pulse">Establishing Database Link...</div>
@@ -314,7 +314,7 @@
                 </div>
             </section>
 
-            <!-- MEDIA GALLERY (NEW) -->
+            <!-- MEDIA GALLERY -->
             <section id="gallerySection" class="space-y-12">
                 <div class="flex justify-between items-end border-b border-white/5 pb-8 text-left">
                     <div>
@@ -324,8 +324,7 @@
                 </div>
                 
                 <div class="grid lg:grid-cols-3 gap-12">
-                    <!-- Media Form -->
-                    <div class="lg:col-span-1 glass-panel p-10 space-y-8">
+                    <div class="lg:col-span-1 glass-panel p-6 md:p-10 space-y-8 bg-zinc-950">
                         <h3 class="text-sm font-black uppercase tracking-[0.3em]">Direct Media Broadcast</h3>
                         <form id="mediaGalleryForm" class="space-y-6">
                             <input type="text" id="mgTitle" placeholder="ASSET TITLE" required class="text-white">
@@ -335,7 +334,7 @@
                                     <option value="image">Still_Capture</option>
                                     <option value="video">Motion_Visual</option>
                                 </select>
-                                <input type="text" id="mgCategory" placeholder="CATEGORY (e.g. Cinema)" class="text-white text-xs">
+                                <input type="text" id="mgCategory" placeholder="CATEGORY" class="text-white text-xs">
                             </div>
 
                             <div class="file-upload-wrapper group" id="mgDropZone">
@@ -347,47 +346,42 @@
                                 <div id="mgPrompt" class="flex flex-col items-center justify-center p-8 text-center cursor-pointer" onclick="document.getElementById('mgFile').click()">
                                     <p class="text-[9px] text-zinc-500 uppercase font-black leading-relaxed">
                                         Select Image or Video<br>
-                                        <span class="text-red-600 opacity-60">(Unlimited Capacity Uplink)</span>
+                                        <span class="text-red-600 opacity-60">(Unlimited Capacity)</span>
                                     </p>
                                 </div>
                                 <img id="mgPreview" class="hidden h-full w-full object-cover">
                                 <video id="mgVideoPreview" class="hidden h-full w-full object-cover" muted loop playsinline></video>
-                                
                                 <div id="mgProgressContainer" class="progress-container hidden">
                                     <div id="mgProgressBar" class="progress-bar"></div>
                                 </div>
                             </div>
                             <input type="hidden" id="mgImageData">
-                            
                             <button type="submit" id="mgBtn" class="btn-red w-full py-5">
                                 <i data-lucide="cast" class="w-4 h-4"></i> Broadcast to Gallery
                             </button>
                         </form>
                     </div>
 
-                    <!-- Media Grid Management -->
                     <div class="lg:col-span-2">
-                        <div id="mediaGalleryList" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <!-- Injected Gallery Items -->
-                        </div>
+                        <div id="mediaGalleryList" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
                     </div>
                 </div>
             </section>
 
-            <!-- LEGACY ARCHIVE -->
+            <!-- HOME ARCHIVE -->
             <section id="archiveSection" class="space-y-12">
                 <div class="flex justify-between items-end border-b border-white/5 pb-8 text-left">
                     <div>
                         <h2 class="text-2xl font-black uppercase tracking-widest text-white">Home <span class="text-red-600">Archive</span></h2>
-                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2 italic">Management of assets rendered on the main index carousel</p>
+                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2 italic">Carousel management for home index</p>
                     </div>
                 </div>
                 
                 <div class="grid lg:grid-cols-3 gap-12">
-                    <div class="lg:col-span-1 glass-panel p-10 space-y-8">
+                    <div class="lg:col-span-1 glass-panel p-6 md:p-10 space-y-8 bg-zinc-950">
                         <form id="galleryForm" class="space-y-6">
                             <input type="text" id="galTitle" placeholder="DATA RECORD LABEL" required class="text-white">
-                            <input type="text" id="galLog" placeholder="LOG_INDEX (e.g. CORE_01)" class="font-mono text-white">
+                            <input type="text" id="galLog" placeholder="LOG_INDEX" class="font-mono text-white">
                             
                             <div class="file-upload-wrapper group" id="galDropZone">
                                 <div id="galImageActions" class="asset-actions hidden">
@@ -396,7 +390,7 @@
                                     </button>
                                 </div>
                                 <div id="galPrompt" class="flex flex-col items-center justify-center p-8 text-center cursor-pointer" onclick="document.getElementById('galFile').click()">
-                                    <p class="text-[9px] text-zinc-500 uppercase font-black leading-relaxed">
+                                    <p class="text-[9px] text-zinc-500 uppercase font-black leading-relaxed text-center">
                                         Upload Capture Metadata<br>
                                         <span class="text-red-600 opacity-60">(Resumable Sync Active)</span>
                                     </p>
@@ -414,7 +408,7 @@
                     </div>
 
                     <div class="lg:col-span-2">
-                        <div id="archiveList" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
+                        <div id="archiveList" class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left"></div>
                     </div>
                 </div>
             </section>
@@ -424,18 +418,18 @@
                 <div class="flex justify-between items-end border-b border-white/5 pb-8 text-left">
                     <div>
                         <h2 class="text-2xl font-black uppercase tracking-widest text-white">Signal <span class="text-red-600">Intercept</span></h2>
-                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2">Communications intercepted from the grid terminal</p>
+                        <p class="text-[10px] text-zinc-600 uppercase tracking-widest mt-2">Incoming communication logs</p>
                     </div>
                 </div>
-                <div id="signalList" class="grid grid-cols-1 xl:grid-cols-2 gap-8 max-h-[1200px] overflow-y-auto pr-4 custom-scrollbar"></div>
+                <div id="signalList" class="grid grid-cols-1 xl:grid-cols-2 gap-8 max-h-[1200px] overflow-y-auto pr-4 custom-scrollbar text-left"></div>
             </section>
         </main>
     </div>
 
-    <!-- Hidden file inputs -->
-    <input type="file" id="evFile" class="hidden">
-    <input type="file" id="galFile" class="hidden">
-    <input type="file" id="mgFile" class="hidden">
+    <!-- External File Inputs -->
+    <input type="file" id="evFile" class="hidden" accept="image/*">
+    <input type="file" id="galFile" class="hidden" accept="image/*">
+    <input type="file" id="mgFile" class="hidden" accept="image/*,video/*">
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -443,7 +437,7 @@
         import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        // INIT
+        // FIREBASE CONFIG
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyCJv9cd_QhzNiwC2_nDd4LwnMANhBOsET8",
             authDomain: "popetown-productions-llc.firebaseapp.com",
@@ -512,56 +506,56 @@
             }));
         }
 
-        // RENDERERS
-        function renderMediaGallery() {
-            const list = document.getElementById('mediaGalleryList');
-            if (masterData.media_gallery.length === 0) {
-                list.innerHTML = `<div class="col-span-2 py-10 text-center text-[9px] text-zinc-700 uppercase tracking-widest italic">Media Core Offline</div>`;
-                return;
-            }
-            list.innerHTML = masterData.media_gallery.map(i => {
-                const isVideo = i.type === 'video';
-                return `
-                <div class="glass-panel group relative aspect-video overflow-hidden bg-black text-left">
-                    ${isVideo ? 
-                        `<video src="${i.url}" muted loop playsinline class="w-full h-full object-cover opacity-60"></video>` : 
-                        `<img src="${i.url}" class="w-full h-full object-cover opacity-60">`}
-                    <div class="absolute inset-0 p-6 flex flex-col justify-end bg-gradient-to-t from-black to-transparent">
-                        <p class="text-[9px] font-black uppercase text-red-600 mb-1 tracking-widest">${i.category || 'Capture'}</p>
-                        <h4 class="text-xs font-bold text-white uppercase">${i.title}</h4>
-                        <div class="mt-4 flex gap-2">
-                            <button onclick="window.purgeNode('media_gallery', '${i.id}')" class="bg-red-600/20 text-red-500 border border-red-600/30 p-2 hover:bg-red-600 hover:text-white transition-all">
-                                <i data-lucide="trash-2" class="w-3 h-3"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
-            if (window.lucide) lucide.createIcons();
-            document.querySelectorAll('#mediaGalleryList video').forEach(v => v.play().catch(()=>{}));
-        }
-
+        // RENDER FUNCTIONS
         function renderEvents() {
             const list = document.getElementById('eventList');
-            list.innerHTML = masterData.events.map(item => `
+            const q = document.getElementById('globalSearch')?.value?.toLowerCase() || '';
+            const filtered = masterData.events.filter(e => e.title?.toLowerCase().includes(q) || e.status?.toLowerCase().includes(q));
+            
+            list.innerHTML = filtered.map(item => `
                 <div class="glass-panel p-8 flex flex-col md:flex-row justify-between items-center gap-8 group text-left">
                     <div class="flex items-center gap-8 w-full">
                         <div class="w-24 h-24 bg-black border border-white/5 flex-shrink-0 overflow-hidden relative">
                             ${item.imagePath ? `<img src="${item.imagePath}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-[8px] opacity-10">NULL</div>`}
                         </div>
                         <div class="space-y-2 flex-1">
-                            <span class="px-2 py-0.5 rounded-full border border-red-600 text-[8px] text-red-500 font-black uppercase">${item.status}</span>
+                            <span class="px-2 py-0.5 rounded-full border border-red-600 text-[8px] text-red-500 font-black uppercase tracking-widest">${item.status}</span>
                             <h4 class="text-xl font-black italic uppercase text-white">${item.title}</h4>
                             ${item.ticketLink ? `<a href="${item.ticketLink}" target="_blank" class="text-[8px] text-red-500 font-bold uppercase tracking-widest border-b border-red-600/30">:: VIEW_TICKETS</a>` : ''}
                         </div>
                     </div>
                     <div class="flex md:flex-col gap-3">
-                        <button onclick="window.editNode('${item.id}')" class="text-[9px] text-white uppercase border border-white/10 px-8 py-3 hover:bg-white/5 font-black">EDIT</button>
-                        <button onclick="window.purgeNode('events', '${item.id}')" class="text-[9px] text-white uppercase bg-red-600/10 border border-red-600/20 px-8 py-3 hover:bg-red-600 font-black">PURGE</button>
+                        <button onclick="window.editNode('${item.id}')" class="text-[9px] text-white uppercase border border-white/10 px-8 py-3 hover:bg-white/5 font-black tracking-widest">EDIT</button>
+                        <button onclick="window.purgeNode('events', '${item.id}')" class="text-[9px] text-white uppercase bg-red-600/10 border border-red-600/20 px-8 py-3 hover:bg-red-600 font-black tracking-widest">PURGE</button>
                     </div>
                 </div>
             `).join('');
             if (window.lucide) lucide.createIcons();
+        }
+
+        function renderMediaGallery() {
+            const list = document.getElementById('mediaGalleryList');
+            if (masterData.media_gallery.length === 0) {
+                list.innerHTML = `<div class="col-span-2 py-10 text-center text-[9px] text-zinc-700 uppercase tracking-widest">Media Core Offline</div>`;
+                return;
+            }
+            list.innerHTML = masterData.media_gallery.map(i => `
+                <div class="glass-panel group relative aspect-video overflow-hidden bg-black text-left">
+                    ${i.type === 'video' ? 
+                        `<video src="${i.url}" muted loop playsinline class="w-full h-full object-cover opacity-60"></video>` : 
+                        `<img src="${i.url}" class="w-full h-full object-cover opacity-60">`}
+                    <div class="absolute inset-0 p-6 flex flex-col justify-end bg-gradient-to-t from-black to-transparent">
+                        <p class="text-[9px] font-black uppercase text-red-600 mb-1 tracking-widest">${i.category || 'Capture'}</p>
+                        <h4 class="text-xs font-bold text-white uppercase">${i.title}</h4>
+                        <div class="mt-4">
+                            <button onclick="window.purgeNode('media_gallery', '${i.id}')" class="bg-red-600/20 text-red-500 border border-red-600/30 p-2 hover:bg-red-600 hover:text-white transition-all">
+                                <i data-lucide="trash-2" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`).join('');
+            if (window.lucide) lucide.createIcons();
+            document.querySelectorAll('#mediaGalleryList video').forEach(v => v.play().catch(()=>{}));
         }
 
         function renderArchive() {
@@ -571,12 +565,11 @@
                     <img src="${i.imageURL}" class="w-full h-full object-cover opacity-60">
                     <div class="absolute inset-0 p-6 flex flex-col justify-end">
                         <p class="text-[10px] font-black uppercase text-white">${i.title}</p>
-                        <button onclick="window.purgeNode('gallery', '${i.id}')" class="mt-4 bg-red-600 p-2 w-fit rounded hover:bg-red-500">
+                        <button onclick="window.purgeNode('gallery', '${i.id}')" class="mt-4 bg-red-600 p-2 w-fit rounded">
                             <i data-lucide="trash-2" class="w-3 h-3 text-white"></i>
                         </button>
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
             if (window.lucide) lucide.createIcons();
         }
 
@@ -593,11 +586,10 @@
                         <button onclick="window.flagNode('${i.id}', ${!i.flagged})" class="text-[9px] font-black uppercase tracking-widest ${i.flagged ? 'text-red-500' : 'text-zinc-700'}">:: FLAG</button>
                         <button onclick="window.purgeNode('inquiries', '${i.id}')" class="text-[9px] text-zinc-800 hover:text-red-600 font-black">TERMINATE</button>
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
         }
 
-        // ASSET UPLINK
+        // STORAGE LOGIC
         const uploadFile = async (file, progressEl, containerEl) => {
             return new Promise((resolve, reject) => {
                 if (!auth.currentUser) return reject("UNAUTHORIZED");
@@ -620,36 +612,16 @@
             document.getElementById(`${prefix}ImageActions`).classList.add('hidden');
         };
 
-        // HANDLERS
+        // EVENT HANDLERS
         document.getElementById('loginForm').onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-            } catch(err) { toast("AUTH_FAILED // ACCESS_DENIED"); }
+            try { await signInWithEmailAndPassword(auth, email, pass); } 
+            catch(err) { toast("ACCESS_DENIED // INVALID_CIPHER"); }
         };
 
         document.getElementById('logoutBtn').onclick = () => { toggleInterface(false); signOut(auth); };
-
-        document.getElementById('mediaGalleryForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('mgBtn');
-            btn.disabled = true;
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'media_gallery'), {
-                    title: document.getElementById('mgTitle').value,
-                    type: document.getElementById('mgType').value,
-                    category: document.getElementById('mgCategory').value,
-                    url: document.getElementById('mgImageData').value,
-                    timestamp: serverTimestamp()
-                });
-                toast("MEDIA_BROADCAST_SUCCESS");
-                e.target.reset();
-                window.clearAsset('mg');
-            } catch(err) { toast("BROADCAST_FAIL"); }
-            btn.disabled = false;
-        };
 
         document.getElementById('eventForm').onsubmit = async (e) => {
             e.preventDefault();
@@ -700,18 +672,38 @@
             document.getElementById('evCancelBtn').classList.add('hidden');
         };
 
+        window.purgeNode = async (c, id) => {
+            if (!confirm("PERMANENTLY TERMINATE NODE?")) return;
+            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', c, id)); toast("NODE_PURGED"); }
+            catch (e) { toast("PURGE_REJECTED"); }
+        };
+
         window.flagNode = async (id, s) => {
             try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'inquiries', id), { flagged: s }); }
             catch (e) { toast("FLAG_FAIL"); }
         };
 
-        window.purgeNode = async (c, id) => {
-            if (!confirm("PURGE PERMANENTLY FROM CORE?")) return;
-            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', c, id)); toast("NODE_PURGED"); }
-            catch (e) { toast("PURGE_REJECTED"); }
+        // MEDIA GALLERY UPLOAD
+        document.getElementById('mediaGalleryForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('mgBtn');
+            btn.disabled = true;
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'media_gallery'), {
+                    title: document.getElementById('mgTitle').value,
+                    type: document.getElementById('mgType').value,
+                    category: document.getElementById('mgCategory').value,
+                    url: document.getElementById('mgImageData').value,
+                    timestamp: serverTimestamp()
+                });
+                toast("MEDIA_SYNC_STABLE");
+                e.target.reset();
+                window.clearAsset('mg');
+            } catch (err) { toast("BROADCAST_FAIL"); }
+            btn.disabled = false;
         };
 
-        // FILE UPLOAD TRIGGERS
+        // UPLOADER LOGIC
         const setupUploader = (inputId, prevId, vidPrevId, dataId, promptId, actionsId, cId, bId) => {
             document.getElementById(inputId).onchange = async (e) => {
                 const f = e.target.files[0]; if (!f) return;
@@ -734,7 +726,6 @@
                             if(vidPrevId) document.getElementById(vidPrevId).classList.add('hidden');
                         }
                     }
-                    toast("SIGNAL_BROADCAST_LOCKED");
                 } catch (err) { toast("UPLINK_ABORTED"); }
             };
         };
@@ -745,8 +736,7 @@
 
         document.getElementById('galleryForm').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('galBtn');
-            btn.disabled = true;
+            const btn = document.getElementById('galBtn'); btn.disabled = true;
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'gallery'), {
                     title: document.getElementById('galTitle').value,
@@ -765,8 +755,7 @@
             const container = document.getElementById('canvas-container');
             if (!container || container.innerHTML !== "") return;
             const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000), ren = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            ren.setSize(window.innerWidth, window.innerHeight);
-            container.appendChild(ren.domElement);
+            ren.setSize(window.innerWidth, window.innerHeight); container.appendChild(ren.domElement);
             const pts = []; for (let i=0; i<2500; i++) pts.push(THREE.MathUtils.randFloatSpread(50), THREE.MathUtils.randFloatSpread(50), THREE.MathUtils.randFloatSpread(50));
             const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
             const mat = new THREE.PointsMaterial({ color: 0xff0000, size: 0.05, transparent: true, opacity: 0.3 });
