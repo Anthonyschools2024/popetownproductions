@@ -12,8 +12,9 @@
     <style>
         :root { --brand-red: #ff0000; --bg-black: #050505; }
         body { background-color: var(--bg-black); color: #ffffff; font-family: 'Inter', sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
-        h1, h2, h3, .nav-link { font-family: 'Orbitron', sans-serif; }
+        h1, h2, h3, .nav-item { font-family: 'Orbitron', sans-serif; }
         
+        /* Persistent Navigation Fix */
         #mainNav {
             position: fixed !important;
             top: 0 !important; left: 0 !important;
@@ -47,6 +48,18 @@
 
         .neon-accent { color: var(--brand-red); text-shadow: 0 0 10px rgba(255, 0, 0, 0.8); }
 
+        .nav-link { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; color: white; text-decoration: none; }
+        .nav-link:hover { color: var(--brand-red); }
+
+        /* Mobile Menu */
+        #mobileMenu { 
+            position: fixed; top: 80px; left: 0; width: 100%; height: calc(100vh - 80px);
+            background: black; z-index: 9998; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; gap: 3rem;
+            transform: translateX(100%); transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #mobileMenu.open { transform: translateX(0); }
+
         input, textarea { 
             background: rgba(255, 255, 255, 0.03); 
             border: 1px solid rgba(255, 255, 255, 0.1); 
@@ -78,20 +91,37 @@
                 <a href="index.html" class="text-xl md:text-2xl font-bold uppercase tracking-tighter italic text-white no-underline">
                     POPETOWN <span class="neon-accent">PRODUCTIONS</span>
                 </a>
-                <div class="hidden lg:flex items-center gap-6 border-l border-white/10 pl-8">
-                    <a href="index.html" class="text-[10px] font-bold tracking-[0.2em] hover:text-red-500 transition-colors uppercase text-white no-underline">Home</a>
-                    <a href="gallery.html" class="text-[10px] font-bold tracking-[0.2em] hover:text-red-500 transition-colors uppercase text-white no-underline">Gallery</a>
-                    <a href="#" class="text-[10px] font-bold tracking-[0.2em] text-red-500 uppercase no-underline">Newsletter</a>
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center gap-8 border-l border-white/10 pl-8">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="gallery.html" class="nav-link">Gallery</a>
+                    <a href="#" class="nav-link" style="color: var(--brand-red)">Newsletter</a>
                 </div>
             </div>
-            <a href="admin.html" class="text-[10px] font-black uppercase border border-white/10 px-6 py-2 hover:border-red-600 transition-all tracking-widest text-white no-underline">Staff_Login</a>
+
+            <div class="flex items-center gap-4">
+                <a href="admin.html" class="hidden md:block text-[10px] font-bold text-zinc-500 hover:text-red-500 uppercase tracking-widest transition-colors no-underline">Staff_Login</a>
+                
+                <!-- Hamburger Toggle -->
+                <button id="menuToggle" class="md:hidden p-2 text-white border border-red-600/30 rounded bg-red-600/5">
+                    <i data-lucide="menu" class="w-8 h-8"></i>
+                </button>
+            </div>
         </div>
     </nav>
+
+    <!-- Mobile Navigation Overlay -->
+    <div id="mobileMenu">
+        <a href="index.html" class="mobile-link text-3xl font-bold uppercase tracking-widest text-white no-underline">Home</a>
+        <a href="gallery.html" class="mobile-link text-3xl font-bold uppercase tracking-widest text-white no-underline">Gallery</a>
+        <a href="#" class="mobile-link text-3xl font-bold uppercase tracking-widest text-red-600 no-underline">Newsletter</a>
+        <a href="admin.html" class="mt-8 border-2 border-red-600 px-10 py-4 text-red-600 uppercase font-black tracking-widest no-underline">Staff Access</a>
+    </div>
 
     <!-- Header Section -->
     <header class="pt-48 pb-20 px-8 max-w-5xl mx-auto text-left">
         <p class="text-red-600 font-black tracking-[0.5em] text-[10px] uppercase mb-4 animate-pulse">:: GLOBAL INTEL FEED ::</p>
-        <h1 class="text-5xl md:text-7xl font-black uppercase tracking-tighter italic leading-none mb-6">POPETOWN<br><span class="neon-accent">NEWSLETTER</span></h1>
+        <h1 class="text-5xl md:text-7xl font-black uppercase tracking-tighter italic leading-none mb-6 text-white">POPETOWN<br><span class="neon-accent">NEWSLETTER</span></h1>
         <p class="text-zinc-500 text-sm tracking-widest uppercase font-light max-w-xl">Deep dives into production mechanics, artist spotlights, and exclusive community updates.</p>
     </header>
 
@@ -104,13 +134,13 @@
 
     <!-- Footer -->
     <footer class="py-20 border-t border-white/5 text-center px-8">
-        <p class="text-[9px] tracking-[0.4em] text-zinc-600 uppercase mb-4">&copy; 2026 POPETOWN HUB // SECURE COMMUNICATIONS ACTIVE</p>
+        <p class="text-[9px] tracking-[0.4em] text-zinc-600 uppercase mb-4 italic font-black">&copy; 2026 POPETOWN HUB // SECURE COMMUNICATIONS ACTIVE</p>
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, query, orderBy, addDoc, serverTimestamp, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'popetown-productions-llc';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -129,21 +159,38 @@
         let newsletterData = [];
         let commentListeners = {};
 
+        // UI Handlers
+        function initUI() {
+            const t = document.getElementById('menuToggle');
+            const m = document.getElementById('mobileMenu');
+            if(t && m) {
+                t.onclick = () => m.classList.toggle('open');
+                document.querySelectorAll('.mobile-link').forEach(l => l.onclick = () => m.classList.remove('open'));
+            }
+        }
+
+        const performAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                else await signInAnonymously(auth);
+            } catch (err) { await signInAnonymously(auth); }
+        };
+
         // Auth and Load
         window.onload = async () => {
             initThree();
-            try {
-                await signInAnonymously(auth);
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        const q = query(collection(db, "artifacts", appId, "public", "data", "newsletter"), orderBy("timestamp", "desc"));
-                        onSnapshot(q, (snap) => {
-                            newsletterData = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                            renderFeed();
-                        });
-                    }
-                });
-            } catch (err) { console.error("Link Failure", err); }
+            initUI();
+            await performAuth();
+            
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    const q = query(collection(db, "artifacts", appId, "public", "data", "newsletter"), orderBy("timestamp", "desc"));
+                    onSnapshot(q, (snap) => {
+                        newsletterData = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                        renderFeed();
+                    });
+                }
+            });
             lucide.createIcons();
         };
 
@@ -178,10 +225,10 @@
 
                                 <form onsubmit="window.postComment(event, '${post.id}')" class="space-y-4 bg-white/5 p-6 rounded-sm">
                                     <div class="grid md:grid-cols-2 gap-4">
-                                        <input type="text" placeholder="Identity (Display Name)" required id="name-${post.id}" class="text-xs">
+                                        <input type="text" placeholder="Identity (Display Name)" required id="name-${post.id}" class="text-xs text-white">
                                         <button type="submit" class="btn-submit">Broadcast Signature</button>
                                     </div>
-                                    <textarea placeholder="Transmission details..." required id="text-${post.id}" rows="2" class="text-xs"></textarea>
+                                    <textarea placeholder="Transmission details..." required id="text-${post.id}" rows="2" class="text-xs text-white"></textarea>
                                 </form>
                             </div>
                         </div>
@@ -240,7 +287,7 @@
                     authorName: nameEl.value,
                     text: textEl.value,
                     timestamp: serverTimestamp(),
-                    isAdmin: false // Default to false for public comments
+                    isAdmin: false 
                 });
                 textEl.value = '';
             } catch (err) { console.error("Transmission failed", err); }
@@ -261,7 +308,11 @@
             cam.position.z = 15;
             function anim() { requestAnimationFrame(anim); sc.rotation.y += 0.0001; ren.render(sc, cam); }
             anim();
-            window.addEventListener('resize', () => { cam.aspect=window.innerWidth/window.innerHeight; cam.updateProjectionMatrix(); ren.setSize(window.innerWidth, window.innerHeight); });
+            window.addEventListener('resize', () => { 
+                cam.aspect=window.innerWidth/window.innerHeight; 
+                cam.updateProjectionMatrix(); 
+                ren.setSize(window.innerWidth, window.innerHeight); 
+            });
         }
     </script>
 </body>
